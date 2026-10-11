@@ -46,6 +46,8 @@ The guide answers the free/native path before mentioning SceneSmith. It distingu
 
 The canonical article is live at [`https://scenesmith.design/blog/schedule-linkedin-posts-free`](https://scenesmith.design/blog/schedule-linkedin-posts-free). It was published from approved PR #3, merge commit `15e0a972b91386e47da66b1564b2b8dc54c5cbfd`, on 2026-10-11. The production verifier confirmed the article response, index directives, image, structured data, sitemap entry, robots sitemap reference, and agent text routes. The PR staging preview remains `noindex` and canonicalizes to the production domain.
 
+Google Search Console accepted a re-submission of `/sitemap.xml` for the `https://scenesmith.design/` property on 2026-10-11. Its report showed 12 discovered URLs before processing this update; the live sitemap now contains 13 URLs, including this article. Google must reprocess the sitemap before that report count changes; submission does not guarantee indexing.
+
 The publishing pipeline and production approval workflow are active on `main`. Hermes itself is **not yet connected or scheduled**: install a separate, repository-scoped GitHub App identity and configure its daily job by following [the Hermes procedure](docs/HERMES.md). Until then, content must be submitted by another authorized GitHub identity. No Hermes, Netlify, Search Console, app/server, or VM credentials are configured in this repository.
 
 ## Local verification
