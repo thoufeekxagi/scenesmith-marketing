@@ -5,17 +5,29 @@ import {SiteNav} from "../../../components/site-nav";
 import {SiteFooter} from "../../../components/site-footer";
 import {GuideVisual} from "../../../components/guide-visual";
 import {BLOG_UPDATED, guideBySlug, guides} from "../../../lib/blog";
+import {allPosts, postBySlug, postHtml} from "../../../lib/posts";
 import {SITE_URL, pageMetadata} from "../../../lib/seo";
 import "../blog.css";
 
 type Params = {params: Promise<{slug: string}>};
-export function generateStaticParams() {return guides.map(({slug}) => ({slug}));}
+export function generateStaticParams() {return [...guides, ...allPosts()].map(({slug}) => ({slug}));}
 export async function generateMetadata({params}: Params): Promise<Metadata> {
-  const {slug} = await params; const guide = guideBySlug(slug);
-  return guide ? pageMetadata(`/blog/${slug}`, `${guide.title} | SceneSmith`, guide.description) : {};
+  const {slug} = await params; const article = guideBySlug(slug) ?? postBySlug(slug);
+  return article ? pageMetadata(`/blog/${slug}`, `${article.title} | SceneSmith`, article.description) : {};
 }
 export default async function GuidePage({params}: Params) {
-  const {slug} = await params; const guide = guideBySlug(slug); if (!guide) notFound();
+  const {slug} = await params; const guide = guideBySlug(slug);
+  if (!guide) {
+    const post = postBySlug(slug); if (!post) notFound();
+    const url = `${SITE_URL}/blog/${post.slug}`;
+    const html = await postHtml(post);
+    const structuredData = {"@context": "https://schema.org", "@type": "Article", headline: post.title, description: post.description, datePublished: post.published, dateModified: post.updated, author: {"@type": "Person", name: post.author}, publisher: {"@type": "Organization", name: "SceneSmith", url: SITE_URL}, mainEntityOfPage: url};
+    return <main className="blog-shell"><script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(structuredData).replace(/</g, "\\u003c")}} /><SiteNav /><div className="blog-container"><article className="guide-article">
+      <nav className="blog-breadcrumb" aria-label="Breadcrumb"><Link href="/blog">Blog</Link><span aria-hidden="true">/</span><span>{post.category}</span></nav>
+      <header className="guide-header"><span className="blog-eyebrow">{post.category.toUpperCase()}</span><h1>{post.title}</h1><p className="guide-deck">{post.description}</p><p className="guide-byline">By {post.author} · Updated {post.updated} · {post.readTime}</p></header>
+      <div className="guide-body markdown-post" dangerouslySetInnerHTML={{__html: html}} />
+    </article><section className="blog-related"><h2>Keep reading</h2><div className="blog-grid">{[...allPosts(), ...guides].filter((item) => item.slug !== slug).slice(0, 3).map((item) => <Link className="blog-card" href={`/blog/${item.slug}`} key={item.slug}><span className="blog-card-category">{item.category}</span><h3>{item.title}</h3><p>{item.description}</p><span className="blog-card-link">Read the guide ↗</span></Link>)}</div></section></div><SiteFooter /></main>;
+  }
   const url = `${SITE_URL}/blog/${guide.slug}`;
   const structuredData = {"@context": "https://schema.org", "@type": "Article", headline: guide.title, description: guide.description, datePublished: BLOG_UPDATED, dateModified: BLOG_UPDATED, author: {"@type": "Person", name: "Thoufeek Baber"}, publisher: {"@type": "Organization", name: "SceneSmith", url: SITE_URL}, mainEntityOfPage: url};
   return <main className="blog-shell"><script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(structuredData).replace(/</g, "\\u003c")}} /><SiteNav /><div className="blog-container"><article className="guide-article">
