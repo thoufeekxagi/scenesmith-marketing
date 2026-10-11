@@ -1,10 +1,14 @@
 const args = process.argv.slice(2);
 const preview = args.includes("--preview");
-const originArgument = args.find((argument) => /^https:\/\//i.test(argument));
-const origin = (originArgument ?? "https://scenesmith.design").replace(/\/$/, "");
-if (preview && !origin.endsWith(".netlify.app")) {
-  console.error("Preview verification requires a Netlify Deploy Preview URL.");
-  process.exit(1);
+let origin = "https://scenesmith.design";
+if (preview) {
+  const previewIndex = args.indexOf("--preview");
+  const pullRequestNumber = args[previewIndex + 1] ?? "";
+  if (!/^\d{1,6}$/.test(pullRequestNumber) || Number(pullRequestNumber) < 1) {
+    console.error("Preview verification requires a numeric pull request number.");
+    process.exit(1);
+  }
+  origin = `https://deploy-preview-${Number(pullRequestNumber)}--scene-smith-website.netlify.app`;
 }
 const slug = "schedule-linkedin-posts-free";
 const articleUrl = `${origin}/blog/${slug}`;
