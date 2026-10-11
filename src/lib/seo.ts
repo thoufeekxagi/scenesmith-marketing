@@ -17,12 +17,16 @@ export const BLOCKED_LOCAL_HOSTS = ["localhost", "127.0.0.1"];
 
 export const OG_IMAGE = {url: "/opengraph-image", width: 1200, height: 630, alt: "SceneSmith: publish from ChatGPT to Instagram, X and LinkedIn"};
 
-export function pageMetadata(path: string, title: string, description: string): Metadata {
+type MetadataImage = {url: string; width: number; height: number; alt: string};
+
+export function pageMetadata(path: string, title: string, description: string, image: MetadataImage = OG_IMAGE): Metadata {
   return {
     title,
     description,
     alternates: {canonical: path},
-    openGraph: {type: "website", url: path, title, description, siteName: SITE_NAME, images: [{...OG_IMAGE}]},
-    twitter: {card: "summary_large_image", title, description, images: [OG_IMAGE.url]}
+    openGraph: {type: "website", url: path, title, description, siteName: SITE_NAME, images: [{...image}]},
+    twitter: {card: "summary_large_image", title, description, images: [image.url]}
   };
 }
+
+export {serializeJsonLd} from "./json-ld.mjs";

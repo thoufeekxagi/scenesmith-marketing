@@ -5,18 +5,19 @@ category: "Publishing guide"
 author: "Thoufeek Baber"
 published: "2026-10-11"
 updated: "2026-10-11"
+primaryKeyword: "the main question a reader asks"
 ---
 
-Start with the direct answer and define who the guide is for. Write at least 350 useful words; a longer article is fine when the topic needs it.
+Answer the actual search question in the opening. Write only as much as the reader needs; word count alone is not an SEO quality signal. Keep claims specific, useful, and supported.
 
 ## What the reader needs to know
 
-Explain the workflow with facts checked against the current product and provider documentation. Link to a relevant [SceneSmith guide](/connections) where it helps the reader.
+Explain the workflow with facts checked against current product and provider documentation. Link to the most relevant existing [SceneSmith guide](/connections) where it helps the reader. Add `image` and descriptive `imageAlt` frontmatter only when the article has an original image under `public/blog/`.
 
 ## How to do it
 
-Give concrete steps, examples, limits, and a way to verify the result. Never claim the ChatGPT plugin is published while it is submitted for review.
+Give concrete steps, examples, limits, and a way to verify the result. Distinguish platform profiles, pages, plans, and account permissions when their behavior differs. Never claim the ChatGPT plugin is published while its status is pending review.
 
 ## Sources
 
-Link to the current [official source](https://help.openai.com/) and any other source used to verify product or provider claims. Replace this template link with the exact supporting page.
+Link to the exact primary source used to verify each product or platform claim. Do not paste private Search Console exports, credentials, or raw Hermes reports into this public repository.

@@ -1,0 +1,73 @@
+name: Owner production approval
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+permissions: {}
+
+jobs:
+  approve-and-merge:
+    if: >-
+      github.event.review.state == 'approved' &&
+      github.event.review.user.login == github.repository_owner
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      checks: read
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Verify the staging deploy and CI, then merge the approved content
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pull_number = context.payload.pull_request.number;
+            const review = context.payload.review;
+            const {data: pull} = await github.rest.pulls.get({owner, repo, pull_number});
+
+            if (pull.base.ref !== "main") throw new Error("Only PRs targeting main can be approved.");
+            if (pull.merged_at) throw new Error("This PR has already been merged.");
+            if (pull.state !== "open") throw new Error("This PR is not open.");
+            if (pull.draft) throw new Error("Mark the PR ready for review before approval.");
+            if (!pull.head.repo || pull.head.repo.full_name.toLowerCase() !== `${owner}/${repo}`.toLowerCase()) {
+              throw new Error("Production publishing accepts branches from this repository only.");
+            }
+            if (pull.user.login.toLowerCase() === owner.toLowerCase()) {
+              throw new Error("The publishing agent must use a separate GitHub identity from the owner.");
+            }
+            if (review.user.login.toLowerCase() !== owner.toLowerCase() || review.state !== "approved") {
+              throw new Error("A submitted approval review by the repository owner is required.");
+            }
+            if (review.commit_id !== pull.head.sha) {
+              throw new Error("The review is for an older commit. Review the current staging preview and approve again.");
+            }
+
+            const files = await github.paginate(github.rest.pulls.listFiles, {owner, repo, pull_number, per_page: 100});
+            const allowed = /^(content\/posts\/[a-z0-9]+(?:-[a-z0-9]+)*\/README\.md|public\/blog\/[a-z0-9][a-z0-9._-]*\.(?:webp|png|jpe?g))$/;
+            if (files.length === 0 || files.length > 12 || files.some((file) => !allowed.test(file.filename) || !["added", "modified"].includes(file.status))) {
+              throw new Error("Routine publishing PRs may change only a post README and its blog images.");
+            }
+            const articleFiles = files.filter((file) => file.filename.startsWith("content/posts/"));
+            if (articleFiles.length === 0 || articleFiles.length > 3) {
+              throw new Error("A publishing PR must contain one to three article README files.");
+            }
+            for (const file of files.filter((item) => item.filename.startsWith("public/blog/"))) {
+              const {data: image} = await github.rest.repos.getContent({owner, repo, path: file.filename, ref: pull.head.sha});
+              if (Array.isArray(image) || image.type !== "file" || image.size > 2_000_000) {
+                throw new Error(`Blog image ${file.filename} must be a regular file no larger than 2 MB.`);
+              }
+            }
+
+            const {data: checks} = await github.rest.checks.listForRef({owner, repo, ref: pull.head.sha, per_page: 100});
+            const ci = checks.check_runs.find((run) => run.name === "verify" && run.status === "completed" && run.conclusion === "success");
+            if (!ci) throw new Error("Marketing CI has not passed for this exact commit.");
+
+            const {data: combined} = await github.rest.repos.getCombinedStatusForRef({owner, repo, ref: pull.head.sha});
+            const preview = combined.statuses.find((status) => status.context === "netlify/scene-smith-website/deploy-preview");
+            if (!preview || preview.state !== "success") throw new Error("The production site's Netlify Deploy Preview must succeed first.");
+
+            await github.rest.pulls.merge({owner, repo, pull_number, merge_method: "squash", sha: pull.head.sha});
+            core.info(`Merged owner-approved staging preview for PR #${pull_number}.`);

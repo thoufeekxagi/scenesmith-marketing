@@ -6,6 +6,7 @@ import {Plus_Jakarta_Sans} from "next/font/google";
 import {GoogleAnalytics} from "../components/google-analytics";
 
 const jakarta = Plus_Jakarta_Sans({subsets: ["latin"], variable: "--font-jakarta", display: "swap"});
+const previewNoindex = process.env.SCENESMITH_NOINDEX === "true";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -16,7 +17,11 @@ export const metadata: Metadata = {
   authors: [{name: "Thoufeek Baber", url: "https://www.linkedin.com/in/thoufeekx"}],
   creator: "Thoufeek Baber",
   alternates: {canonical: "/"},
-  robots: {index: true, follow: true, googleBot: {index: true, follow: true, "max-image-preview": "large", "max-snippet": -1}},
+  robots: {
+    index: !previewNoindex,
+    follow: true,
+    googleBot: {index: !previewNoindex, follow: true, "max-image-preview": "large", "max-snippet": -1}
+  },
   openGraph: {type: "website", url: "/", siteName: SITE_NAME, title: SITE_TITLE, description: SITE_DESCRIPTION, locale: "en_CA", images: [{...OG_IMAGE}]},
   twitter: {card: "summary_large_image", title: SITE_TITLE, description: SITE_DESCRIPTION, images: [OG_IMAGE.url]},
   icons: {icon: "/favicon.svg"},
