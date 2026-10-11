@@ -14,9 +14,11 @@
 
 [context.deploy-preview.environment]
   SCENESMITH_ENABLE_GA = "false"
+  SCENESMITH_NOINDEX = "true"
 
 [context.branch-deploy.environment]
   SCENESMITH_ENABLE_GA = "false"
+  SCENESMITH_NOINDEX = "true"
 
 # The Netlify site is the public marketing origin. Customer authentication,
 # billing, provider callbacks, and MCP all run on the application origin.
