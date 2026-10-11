@@ -1,6 +1,8 @@
 import {existsSync, readFileSync, readdirSync, statSync} from "node:fs";
 import {join} from "node:path";
 import {parsePostSource} from "./post-frontmatter.mjs";
+import {extractPostFaq} from "./post-faq.mjs";
+import type {PostFaq} from "./post-faq.mjs";
 
 const postsDirectory = join(process.cwd(), "content", "posts");
 
@@ -14,6 +16,7 @@ export type MarkdownPost = {
   updated: string;
   readTime: string;
   body: string;
+  faqs: PostFaq[];
   image?: string;
   imageAlt?: string;
 };
@@ -51,6 +54,7 @@ export function allPosts(): MarkdownPost[] {
         updated: String(data.updated),
         readTime: `${Math.max(1, Math.ceil(words / 220))} min read`,
         body: content,
+        faqs: extractPostFaq(content),
         image,
         imageAlt: data.imageAlt
       };

@@ -3,7 +3,7 @@ import {join} from "node:path";
 
 const root = process.cwd();
 const requiredPageRoutes = ["/", "/connections", "/mcp", "/support", "/security", "/privacy", "/terms", "/data-deletion", "/blog"];
-const requiredHandlerRoutes = ["/agents.md", "/llms.txt"];
+const requiredHandlerRoutes = ["/agent.md", "/agents.md", "/llms.txt", "/llms-full.txt"];
 const forbiddenPaths = ["apps/worker", "apps/mcp", "supabase", "docker-compose.production.yml", "Dockerfile", "src/app/api", "src/app/app", "src/app/auth"];
 const failures = [];
 

@@ -21,7 +21,7 @@ The extra Netlify project `scenesmith-marketing-preview` is unlinked and unused.
 
 The active `main` ruleset requires a PR, passing `verify` and Netlify preview checks, an approving Code Owner review, resolved review threads, and the latest commit to have been reviewed. It blocks branch deletion and force pushes. The repository's only human collaborator is the owner. The single admin bypass is limited to pull requests; it is needed once for the owner-authored bootstrap because GitHub does not let a PR author approve their own PR.
 
-GitHub Actions defaults to a read-only token. This repository has no GitHub Actions secrets or variables, no Netlify deploy token, and no VM credentials. The two environment variables on the live Netlify project are configured only in the Production context; Deploy Previews have no values for them. The app/server repository remains private and is not a remote, submodule, workflow dependency, or deployment target here.
+GitHub Actions defaults to read-only permissions outside the trusted merge job. This repository has no GitHub Actions secrets or variables, no Netlify deploy token, and no VM credentials. Blog publishing requires no site secrets. The app/server repository remains private and is not a remote, submodule, workflow dependency, or deployment target here.
 
 Post frontmatter uses a strict YAML 1.2 data-only parser with a small field allowlist; JavaScript frontmatter, YAML aliases, custom tags, and raw HTML are rejected. Markdown renders as React elements with raw HTML skipped and unsafe link schemes filtered. These checks protect the public PR build, which must treat article text and images as untrusted input.
 
@@ -30,10 +30,13 @@ Post frontmatter uses a strict YAML 1.2 data-only parser with a small field allo
 - `/sitemap.xml` reads public pages and article metadata. Adding a post adds its canonical URL and updated date.
 - `/robots.txt` advertises the production sitemap. Netlify Deploy Preview hosts allow crawlers to see page-level `noindex` metadata and do not advertise the production sitemap.
 - `/llms.txt` lists the current product pages, guides, and articles.
+- `/llms-full.txt` contains the current public guide and article text in one plain-text response for retrieval systems.
+- `/agent.md` and `/agents.md` give assistants safe, public product and citation guidance.
 - `/agents.md` lists the public marketing content and tells agents to cite canonical pages and avoid inferring unlisted product features.
-- Blog Article JSON-LD, canonical URL, Open Graph image, and X/Twitter image come from article metadata.
+- Blog Article, BreadcrumbList, and visible FAQ JSON-LD, canonical URL, Open Graph image, and X/Twitter image come from article metadata and Markdown.
+- `max-snippet:-1` is emitted as page-level Googlebot metadata. It is not a `robots.txt` directive.
 
-The `/llms.txt` and `/agents.md` files support content discovery; neither guarantees ranking or indexing. `/site.xml` is not a second sitemap. Google Search Console already has the production sitemap submission; check its reports after publishing. Submitting a sitemap does not guarantee indexing, and Google's Indexing API is not for ordinary blog posts.
+The `/llms.txt`, `/llms-full.txt`, `/agent.md`, and `/agents.md` files support agent discovery; they do not guarantee Google ranking or indexing. `/site.xml` is not a second sitemap. Google Search Console already has the production sitemap submission; check its reports after publishing. Submitting a sitemap does not guarantee indexing, and Google's Indexing API is not for ordinary blog posts.
 
 ## Pilot article from the Hermes handoff
 

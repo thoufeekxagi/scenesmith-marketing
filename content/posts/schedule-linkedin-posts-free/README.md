@@ -63,9 +63,49 @@ Yes. LinkedIn’s built-in composer has a scheduling control, so a separate sche
 
 For a personal profile, LinkedIn currently allows 10 minutes to three months ahead. For a Page, it is one hour to three months. Check the composer because platform limits can change.
 
+### How far ahead can I schedule a post on a LinkedIn Page?
+
+A Page post must be scheduled at least one hour ahead and no more than three months ahead. Review the time shown by LinkedIn before confirming.
+
+### Who can schedule a post for a LinkedIn Page?
+
+LinkedIn says a Page super admin or content admin can schedule Page posts. If you cannot see the scheduling control, first confirm that you are posting as the Page and have one of those roles.
+
 ### Can I change a post after scheduling it?
 
 Yes. Open **View all scheduled posts**, select the post, and use the available edit, reschedule, or delete controls.
+
+### Where do I find my scheduled LinkedIn posts?
+
+Open the composer for the same profile or Page and choose the clock icon. Select **View all scheduled posts** on desktop or **View all** on mobile.
+
+### Does LinkedIn use my device time zone for scheduled posts?
+
+LinkedIn says profile-post times are converted to UTC using the device time-zone setting. Check the final time shown in the composer, especially when travelling or using a shared device.
+
+### Which personal-profile posts cannot be scheduled?
+
+LinkedIn's profile scheduling help lists Events and Jobs as unsupported post types. If the clock is missing, check the format and confirm you are using the profile composer.
+
+### Which LinkedIn Page posts cannot be scheduled?
+
+LinkedIn's Page scheduling help lists multiple photos, reshares, polls, and Services as unsupported. Try a supported format and confirm you have Page admin access.
+
+### Why is the schedule option missing?
+
+Check that you selected the intended profile or Page, that your Page role is super admin or content admin, and that the post uses a supported format. Page posts also need to be at least one hour ahead.
+
+### Can LinkedIn's built-in scheduler publish to Instagram or X too?
+
+No. It schedules LinkedIn posts only. Use it for a LinkedIn-only queue; it does not coordinate a shared Instagram, X, and LinkedIn calendar.
+
+### When is a LinkedIn post actually scheduled?
+
+After you select **Schedule**, wait for LinkedIn's confirmation and check that the item appears in **View all scheduled posts**. A draft left in the composer is not a scheduled post.
+
+### Can I schedule a LinkedIn post from my phone?
+
+Yes. LinkedIn's post composer is available on mobile. Choose **Post**, add the content, use the clock control, then check the final date and time before confirming.
 
 ### Where can I see examples of LinkedIn posts to schedule?
 

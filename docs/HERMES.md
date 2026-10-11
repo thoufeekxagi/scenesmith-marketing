@@ -16,7 +16,54 @@ The extra Netlify project named `scenesmith-marketing-preview` is currently unli
 4. The App may create a branch and PR, but it cannot administer the repository. The owner reviews the Netlify preview and submits an approving GitHub review. A workflow on `main` verifies that review is for the current commit, checks CI and Netlify's preview status, and squash-merges only a content-and-image-only PR.
 5. Hermes should run from its own workspace/schedule. Do not run the daily researcher or publisher on the SceneSmith VM or through a Netlify build hook.
 
-The public source repository has no Netlify deploy token. Netlify's GitHub integration builds the connected marketing repository. The CI workflow uses a read-only GitHub token for checks and has no production secrets.
+The public source repository has no Netlify deploy token. Netlify's GitHub integration builds the connected marketing repository. GitHub Actions uses its short-lived default `GITHUB_TOKEN` with job-scoped permissions; no Actions secret or variable is needed for blog publishing.
+
+## Exact Hermes inputs and environment variables
+
+Use these as the publishing job's repository and destination settings. They are plain configuration values, not credentials:
+
+```text
+repository: thoufeekxagi/scenesmith-marketing
+production_branch: main
+article_directory: content/posts/<slug>/README.md
+image_directory: public/blog/<slug>.<webp|png|jpg>
+staging: Netlify Deploy Preview on the pull request
+production: https://scenesmith.design after an owner-approved merge
+```
+
+The routine content job has **no site environment variables** to set. Do not copy application or VM variables into Hermes. For completeness, these are the public-site build switches currently used by the marketing repo:
+
+| Variable | Where it is used | Needed by Hermes? |
+| --- | --- | --- |
+| `SCENESMITH_ENABLE_GA` | `netlify.toml` context switch: false in development and previews, true in production | No |
+| `SCENESMITH_NOINDEX` | Set to `true` for preview and branch deploy builds; GitHub CI also sets it for its preview build | No; CI/Netlify set it |
+| `NEXT_PUBLIC_SCENESMITH_ENABLE_GA` | Derived by `next.config.ts` from the Netlify context; do not set manually | No |
+| `SCENESMITH_DEPLOYMENT_ENV` | Optional promo-display feature read by `src/lib/launch-offer.ts` | No |
+| `SCENESMITH_LAUNCH_OFFER_CODE` | Optional public promo display code; not a Stripe secret and unrelated to article publishing | No |
+
+GitHub Actions currently reports zero repository Actions secrets and zero Actions variables. Keep it that way for routine blog publishing. If Hermes connects through a GitHub App, install it on this repository only and keep its private key in Hermes' credential store. The App needs contents read/write, pull request read/write, and read-only checks/status access so it can branch, push article files, open a PR, and read preview checks. Do not give it repository administration, Actions write, Netlify, Google Search Console, VM, database, social provider, or app/server access. It must not submit its own approval. The owner review is the production gate; the trusted workflow merges the approved PR.
+
+### Copy-ready scheduled job instruction
+
+```text
+Work only in thoufeekxagi/scenesmith-marketing, targeting main. Read AGENTS.md,
+content/TEMPLATE.md, and docs/HERMES.md before writing. Each run may create zero
+to three genuinely distinct, well-sourced articles; do not publish just to meet
+a quota. Confirm the query is not already answered, verify product claims from
+the public marketing site and primary sources, and keep raw research exports
+out of this public repository. Put each article in
+content/posts/<slug>/README.md and original article images only in public/blog/.
+Do not edit site code, workflows, configuration, redirects, or any app/server
+files. Run pnpm install --frozen-lockfile, pnpm validate:content,
+pnpm test:content-safety, pnpm typecheck, SCENESMITH_NOINDEX=true pnpm build,
+SCENESMITH_NOINDEX=true pnpm verify:preview, and pnpm verify:marketing. If all
+checks pass, open a PR against main and report its Deploy Preview URL, source
+quality, factual claims, internal links, images, and test results. Never merge
+or deploy. Wait for the repository owner's approval; the protected workflow
+will verify the exact commit and preview and publish it through Netlify.
+Stop and report any failed check, product claim without a primary source,
+duplicate intent, secret, or change outside the permitted content/image paths.
+```
 
 ## Daily research and writing
 
@@ -30,7 +77,7 @@ The public source repository has no Netlify deploy token. Netlify's GitHub integ
 
 1. Create a branch and open a PR against `main`. A routine content PR may contain only article `README.md` files under `content/posts/` and their images under `public/blog/`.
 2. GitHub Actions runs content validation, adversarial content safety checks, typecheck, the preview build with `SCENESMITH_NOINDEX=true`, and marketing-boundary verification. Netlify builds a Deploy Preview for the PR.
-3. Wait for both **Marketing CI / verify** and **netlify/scene-smith-website/deploy-preview** to pass. Open the preview and check the full article on desktop and mobile, its links, title, canonical, Article JSON-LD, image/alt text, and noindex. Read the exact rendered article; a passing build is not editorial approval.
+3. Wait for both **Marketing CI / verify** and **netlify/scene-smith-website/deploy-preview** to pass. Run `node scripts/verify-live.mjs --preview <deploy-preview-url>`. Open the preview and check the full article on desktop and mobile, its links, title, canonical, Article/Breadcrumb/FAQ JSON-LD, image/alt text, and noindex. Read the exact rendered article; a passing build is not editorial approval.
 4. Send the preview URL and the PR summary to the owner. Do not merge or publish while waiting.
 5. After the owner reviews the preview, the owner submits an **Approve** review on the PR. The workflow reads that event from the trusted default branch, checks that the PR comes from a separate identity and changes only approved content/image paths, rechecks CI and the production site's Netlify preview status for the exact head commit, then squash-merges that same commit. New commits dismiss the old review and require a new preview and approval.
 6. Netlify publishes the merge from `main` to `https://scenesmith.design`. Confirm the deploy commit and live page before marking the run complete.
@@ -41,10 +88,10 @@ The first pipeline PR is a bootstrap: the owner review workflow cannot run until
 
 - `/sitemap.xml` is generated from public page and article metadata. New posts enter it automatically; do not edit it by hand.
 - `/robots.txt` points production crawlers to that sitemap. Deploy Preview hosts allow crawlers to read the page-level `noindex` directive and do not advertise the production sitemap.
-- `/llms.txt` and `/agents.md` are generated from the current guide and article lists. They help discovery and citation; they are not ranking guarantees or Google indexing controls.
+- `/llms.txt`, `/llms-full.txt`, `/agent.md`, and `/agents.md` are generated from public marketing content. They help assistants discover and cite the site; they are not Google ranking or indexing guarantees.
 - `/site.xml` is not a second sitemap. Use the standard `/sitemap.xml` endpoint.
 - Submit the production sitemap once in Google Search Console and monitor its Sitemaps and Pages reports. Google says a sitemap is a discovery hint, not a guarantee of crawling, indexing, or ranking. The Indexing API is not a general blog-submission API; it is limited to eligible job-posting and livestream pages.
-- After production, verify the article's 200 response, production canonical, Article JSON-LD, sitemap `lastmod`, internal links, and indexable production metadata. Check that the Netlify preview still reports `noindex`.
+- After production, run `pnpm verify:live` to verify the article's 200 response, production canonical, image, Article/Breadcrumb/FAQ JSON-LD, sitemap `lastmod`, robots sitemap reference, text routes, and indexable production metadata. Check that the Netlify preview still reports `noindex`.
 
 ## Stop conditions
 

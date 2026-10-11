@@ -29,4 +29,22 @@ export function pageMetadata(path: string, title: string, description: string, i
   };
 }
 
+export function articleMetadata(path: string, title: string, description: string, published: string, modified: string, author: string, image?: MetadataImage): Metadata {
+  const socialImage = image ?? OG_IMAGE;
+  return {
+    ...pageMetadata(path, title, description, socialImage),
+    openGraph: {
+      type: "article",
+      url: path,
+      title,
+      description,
+      siteName: SITE_NAME,
+      images: [socialImage],
+      publishedTime: published,
+      modifiedTime: modified,
+      authors: [author]
+    }
+  };
+}
+
 export {serializeJsonLd} from "./json-ld.mjs";

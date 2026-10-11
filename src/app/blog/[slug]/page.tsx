@@ -7,7 +7,8 @@ import {SiteFooter} from "../../../components/site-footer";
 import {GuideVisual} from "../../../components/guide-visual";
 import {BLOG_UPDATED, guideBySlug, guides} from "../../../lib/blog";
 import {allPosts, postBySlug} from "../../../lib/posts";
-import {SITE_URL, pageMetadata, serializeJsonLd} from "../../../lib/seo";
+import {articleMetadata, serializeJsonLd} from "../../../lib/seo";
+import {blogStructuredData} from "../../../lib/structured-blog";
 import "../blog.css";
 
 type Params = {params: Promise<{slug: string}>};
@@ -21,25 +22,26 @@ export async function generateMetadata({params}: Params): Promise<Metadata> {
     height: 631,
     alt: article.imageAlt ?? article.title
   } : undefined;
-  return pageMetadata(`/blog/${slug}`, `${article.title} | SceneSmith`, article.description, image);
+  const published = "published" in article ? article.published : BLOG_UPDATED;
+  const updated = "updated" in article ? article.updated : BLOG_UPDATED;
+  const author = "author" in article ? article.author : "Thoufeek Baber";
+  return articleMetadata(`/blog/${slug}`, `${article.title} | SceneSmith`, article.description, published, updated, author, image);
 }
 export default async function GuidePage({params}: Params) {
   const {slug} = await params; const guide = guideBySlug(slug);
   if (!guide) {
     const post = postBySlug(slug); if (!post) notFound();
-    const url = `${SITE_URL}/blog/${post.slug}`;
-    const structuredData = {"@context": "https://schema.org", "@type": "Article", headline: post.title, description: post.description, datePublished: post.published, dateModified: post.updated, author: {"@type": "Person", name: post.author}, publisher: {"@type": "Organization", name: "SceneSmith", url: SITE_URL}, mainEntityOfPage: url, image: post.image ? new URL(post.image, SITE_URL).toString() : undefined};
+    const structuredData = blogStructuredData(post);
     return <main className="blog-shell"><script type="application/ld+json" dangerouslySetInnerHTML={{__html: serializeJsonLd(structuredData)}} /><SiteNav /><div className="blog-container"><article className="guide-article">
-      <nav className="blog-breadcrumb" aria-label="Breadcrumb"><Link href="/blog">Blog</Link><span aria-hidden="true">/</span><span>{post.category}</span></nav>
+      <nav className="blog-breadcrumb" aria-label="Breadcrumb"><Link href="/blog">Blog</Link><span aria-hidden="true">/</span><span aria-current="page">{post.title}</span></nav>
       <header className="guide-header"><span className="blog-eyebrow">{post.category.toUpperCase()}</span><h1>{post.title}</h1><p className="guide-deck">{post.description}</p><p className="guide-byline">By {post.author} · Updated {post.updated} · {post.readTime}</p></header>
       {post.image && <figure className="blog-post-cover"><img src={post.image} alt={post.imageAlt ?? ""} width="1200" height="631" /></figure>}
       <div className="guide-body markdown-post"><ReactMarkdown skipHtml>{post.body}</ReactMarkdown></div>
     </article><section className="blog-related"><h2>Keep reading</h2><div className="blog-grid">{[...allPosts(), ...guides].filter((item) => item.slug !== slug).slice(0, 3).map((item) => <Link className="blog-card" href={`/blog/${item.slug}`} key={item.slug}><span className="blog-card-category">{item.category}</span><h3>{item.title}</h3><p>{item.description}</p><span className="blog-card-link">Read the guide ↗</span></Link>)}</div></section></div><SiteFooter /></main>;
   }
-  const url = `${SITE_URL}/blog/${guide.slug}`;
-  const structuredData = {"@context": "https://schema.org", "@type": "Article", headline: guide.title, description: guide.description, datePublished: BLOG_UPDATED, dateModified: BLOG_UPDATED, author: {"@type": "Person", name: "Thoufeek Baber"}, publisher: {"@type": "Organization", name: "SceneSmith", url: SITE_URL}, mainEntityOfPage: url};
+  const structuredData = blogStructuredData({slug: guide.slug, title: guide.title, description: guide.description, category: guide.category, author: "Thoufeek Baber", published: BLOG_UPDATED, updated: BLOG_UPDATED, faqs: guide.faq});
   return <main className="blog-shell"><script type="application/ld+json" dangerouslySetInnerHTML={{__html: serializeJsonLd(structuredData)}} /><SiteNav /><div className="blog-container"><article className="guide-article">
-    <nav className="blog-breadcrumb" aria-label="Breadcrumb"><Link href="/blog">Blog</Link><span aria-hidden="true">/</span><span>{guide.category}</span></nav>
+    <nav className="blog-breadcrumb" aria-label="Breadcrumb"><Link href="/blog">Blog</Link><span aria-hidden="true">/</span><span aria-current="page">{guide.title}</span></nav>
     <header className="guide-header"><span className="blog-eyebrow">{guide.category.toUpperCase()}</span><h1>{guide.title}</h1><p className="guide-deck">{guide.description}</p><p className="guide-byline">By Thoufeek Baber · Updated {BLOG_UPDATED} · {guide.readTime}</p></header>
     <GuideVisual guide={guide} />
     <div className="guide-body"><aside className="guide-takeaway"><strong>The short answer</strong><p>{guide.answer}</p></aside>{guide.intro.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}<div className="guide-inline-action"><p>Want to try this with your own account?</p><a href={guide.primaryAction.url}>{guide.primaryAction.label} ↗</a><a href={guide.existingAction.url}>{guide.existingAction.label}</a></div>

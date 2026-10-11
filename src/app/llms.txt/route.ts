@@ -28,7 +28,9 @@ export function GET() {
     ...postLines,
     "",
     `- [Blog index](${SITE_URL}/blog)`,
-    `- [Sitemap](${SITE_URL}/sitemap.xml)`
+    `- [Sitemap](${SITE_URL}/sitemap.xml)`,
+    `- [Full public content](${SITE_URL}/llms-full.txt)`,
+    `- [Agent guide](${SITE_URL}/agent.md)`
   ].join("\n");
 
   return new Response(`${body}\n`, {headers: {"content-type": "text/plain; charset=utf-8"}});

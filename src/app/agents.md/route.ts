@@ -25,7 +25,9 @@ export function GET() {
     ...articles,
     "",
     `- Sitemap: ${SITE_URL}/sitemap.xml`,
-    `- AI-readable index: ${SITE_URL}/llms.txt`
+    `- AI-readable index: ${SITE_URL}/llms.txt`,
+    `- Full public content: ${SITE_URL}/llms-full.txt`,
+    `- Agent guide: ${SITE_URL}/agent.md`
   ].join("\n");
 
   return new Response(`${body}\n`, {headers: {"content-type": "text/markdown; charset=utf-8"}});

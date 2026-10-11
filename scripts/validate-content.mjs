@@ -1,6 +1,7 @@
 import {existsSync, readFileSync, readdirSync, statSync} from "node:fs";
 import {join} from "node:path";
 import {parsePostSource} from "../src/lib/post-frontmatter.mjs";
+import {extractPostFaq} from "../src/lib/post-faq.mjs";
 
 const root = join(process.cwd(), "content", "posts");
 const legacySlugs = new Set(["automate-social-media-posts", "chatgpt-linkedin-posts", "chatgpt-instagram-posts"]);
@@ -40,6 +41,13 @@ for (const {name: slug} of posts) {
   if (typeof data.published === "string" && data.published > today) failures.push(`${label}: published is in the future`);
   if (typeof data.published === "string" && typeof data.updated === "string" && data.updated < data.published) failures.push(`${label}: updated is before published`);
   if ((content.match(/^## /gm) ?? []).length < 2) failures.push(`${label}: article needs at least two H2 sections`);
+  const faqs = extractPostFaq(content);
+  if (faqs.length > 0 && faqs.length < 3) failures.push(`${label}: an FAQ section must contain at least three question-and-answer pairs`);
+  if (faqs.length > 20) failures.push(`${label}: keep the FAQ section to 20 or fewer useful questions`);
+  const faqQuestions = faqs.map(({question}) => question.toLowerCase());
+  if (new Set(faqQuestions).size !== faqQuestions.length) failures.push(`${label}: FAQ questions must be unique`);
+  if (faqs.some(({question, answer}) => !question || !answer)) failures.push(`${label}: every FAQ question needs a visible answer`);
+  if (slug === "schedule-linkedin-posts-free" && faqs.length < 12) failures.push(`${label}: the pilot needs at least 12 visible FAQs`);
   if (/^# /m.test(content)) failures.push(`${label}: put the H1 in title frontmatter, not the body`);
   if (!/\]\(\/(?:blog|connections|mcp|pricing|support)(?:[\/#?][^)]*)?\)/.test(content)) failures.push(`${label}: include a relevant internal link`);
   if (!/\]\(https:\/\/[^)]+\)/.test(content)) failures.push(`${label}: cite at least one external source`);

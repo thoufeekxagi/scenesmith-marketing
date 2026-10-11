@@ -18,6 +18,14 @@ Explain the workflow with facts checked against current product and provider doc
 
 Give concrete steps, examples, limits, and a way to verify the result. Distinguish platform profiles, pages, plans, and account permissions when their behavior differs. Never claim the ChatGPT plugin is published while its status is pending review.
 
+## Questions readers ask
+
+Add at least three distinct questions when they help readers finish the task or resolve a real limitation. Keep every answer visible here in Markdown and source platform-specific claims below. The site derives FAQ structured data from this section, so do not add questions to JSON-LD that readers cannot see.
+
+### A specific question a reader might ask?
+
+Give a direct answer supported by the article and its sources.
+
 ## Sources
 
 Link to the exact primary source used to verify each product or platform claim. Do not paste private Search Console exports, credentials, or raw Hermes reports into this public repository.

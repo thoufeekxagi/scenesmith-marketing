@@ -11,6 +11,7 @@
     "verify:marketing": "node scripts/verify-marketing.mjs",
     "validate:content": "node scripts/validate-content.mjs",
     "verify:preview": "node scripts/verify-preview.mjs",
+    "verify:live": "node scripts/verify-live.mjs",
     "test:content-safety": "node scripts/test-content-safety.mjs"
   },
   "dependencies": {

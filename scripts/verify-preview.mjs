@@ -6,6 +6,14 @@ const failures = [];
 if (process.env.SCENESMITH_NOINDEX !== "true") failures.push("preview build must set SCENESMITH_NOINDEX=true");
 if (!existsSync(root)) failures.push("missing Next.js server output; run pnpm build first");
 
+const manifestPath = join(process.cwd(), ".next", "server", "app-paths-manifest.json");
+if (existsSync(manifestPath)) {
+  const routes = Object.keys(JSON.parse(readFileSync(manifestPath, "utf8")));
+  for (const route of ["/agent.md/route", "/llms-full.txt/route"]) {
+    if (!routes.includes(route)) failures.push(`preview build is missing the ${route.slice(1, -6)} endpoint`);
+  }
+} else failures.push("missing Next.js route manifest; run pnpm build first");
+
 const htmlFiles = [];
 function visit(directory) {
   for (const entry of readdirSync(directory, {withFileTypes: true})) {
@@ -23,7 +31,11 @@ for (const file of htmlFiles) {
     failures.push(`${file.slice(root.length + 1)}: missing page-level noindex`);
   }
   const googlebot = html.match(/<meta\s+name="googlebot"\s+content="([^"]+)"/i)?.[1];
-  if (googlebot && !/^noindex(?:,|\s|$)/i.test(googlebot)) failures.push(`${file.slice(root.length + 1)}: Googlebot metadata permits indexing`);
+  if (!googlebot) failures.push(`${file.slice(root.length + 1)}: missing Googlebot page metadata`);
+  else {
+    if (!/^noindex(?:,|\s|$)/i.test(googlebot)) failures.push(`${file.slice(root.length + 1)}: Googlebot metadata permits indexing`);
+    if (!googlebot.includes("max-snippet:-1")) failures.push(`${file.slice(root.length + 1)}: Googlebot metadata must keep max-snippet:-1`);
+  }
 }
 
 const article = join(root, "blog", "schedule-linkedin-posts-free.html");
@@ -35,6 +47,8 @@ else {
   }
   const imageUrl = "https://scenesmith.design/blog/schedule-linkedin-posts-free.webp";
   if (!html.includes(`property="og:image" content="${imageUrl}"`)) failures.push("pilot article Open Graph image must use its canonical production URL");
+  if (!html.includes('property="og:type" content="article"')) failures.push("pilot article must use the Open Graph article type");
+  if (!html.includes('property="article:published_time" content="2026-10-11"') || !html.includes('property="article:modified_time" content="2026-10-11"')) failures.push("pilot article Open Graph metadata must include publish and modified dates");
   if (!html.includes(`name="twitter:image" content="${imageUrl}"`)) failures.push("pilot article X/Twitter image must use its canonical production URL");
   if (!html.includes('<figure class="blog-post-cover"><img src="/blog/schedule-linkedin-posts-free.webp"')) {
     failures.push("pilot article must render its blog cover image");
@@ -42,12 +56,21 @@ else {
   const schemaText = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
   try {
     const schema = schemaText ? JSON.parse(schemaText) : null;
-    if (schema?.["@type"] !== "Article" || schema.mainEntityOfPage !== "https://scenesmith.design/blog/schedule-linkedin-posts-free" || schema.image !== imageUrl) {
-      failures.push("pilot Article JSON-LD must include the production canonical URL and article image");
+    const graph = schema?.["@graph"];
+    const articleSchema = graph?.find((item) => item?.["@type"] === "Article");
+    const breadcrumbSchema = graph?.find((item) => item?.["@type"] === "BreadcrumbList");
+    const faqSchema = graph?.find((item) => item?.["@type"] === "FAQPage");
+    if (schema?.["@context"] !== "https://schema.org" || !articleSchema || articleSchema.mainEntityOfPage !== "https://scenesmith.design/blog/schedule-linkedin-posts-free" || articleSchema.image !== imageUrl || !articleSchema.datePublished || !articleSchema.dateModified) {
+      failures.push("pilot Article JSON-LD must include canonical URL, dates, and article image");
     }
+    if (breadcrumbSchema?.itemListElement?.length !== 2 || breadcrumbSchema.itemListElement[0].name !== "Blog" || breadcrumbSchema.itemListElement[1].name !== "How to Schedule LinkedIn Posts for Free") failures.push("pilot JSON-LD must include a breadcrumb trail matching the article");
+    if ((faqSchema?.mainEntity?.length ?? 0) < 12) failures.push("pilot JSON-LD must include the 12 or more visible FAQ pairs");
   } catch {
     failures.push("pilot Article JSON-LD must be valid JSON");
   }
+  const faqSection = html.match(/<h2>Questions about free LinkedIn scheduling<\/h2>([\s\S]*?)<h2>Sources<\/h2>/i)?.[1] ?? "";
+  const visibleFaqs = (faqSection.match(/<h3>/g) ?? []).length;
+  if (visibleFaqs < 12) failures.push("pilot article must visibly render the 12 or more FAQ pairs used by its schema");
 }
 
 if (failures.length) {
