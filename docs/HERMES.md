@@ -4,6 +4,8 @@
 
 Hermes works only in `thoufeekxagi/scenesmith-marketing`. Give its GitHub identity access to **this repository only**. Do not give it the `scenesmithgptapp` repository, a Netlify token, SSH access, VM credentials, database credentials, or social-provider credentials. The Netlify site builds `main` from this repository and forwards application paths to `app.scenesmith.design`.
 
+The production Netlify site is configured to accept production deploys only from its Git production branch. CLI, MCP, and API deploys cannot publish to production.
+
 The private repository currently uses GitHub Free. GitHub does not enforce branch protection on this private repository under that plan. Until it is made public or the GitHub plan supports private-repo rules, the PR and CI requirement is an agent operating rule, not a GitHub-enforced barrier. Do not give Hermes unattended merge authority while that barrier is absent if enforced review is required.
 
 ## One-time setup
