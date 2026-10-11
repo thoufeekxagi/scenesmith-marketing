@@ -1,0 +1,31 @@
+/* Versioned override for the subscription modal's publishing row. */
+.trial-modal-feature-publishing {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 11px !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+}
+
+.trial-modal-feature-publishing .trial-modal-feature-label {
+  min-width: 0 !important;
+  width: auto !important;
+  flex: 0 1 auto !important;
+}
+
+.trial-modal-feature-publishing .trial-modal-platforms {
+  margin-left: 0 !important;
+  flex: 0 0 auto !important;
+}
+
+@media (max-width: 640px) {
+  .trial-modal-feature-publishing {
+    width: 100% !important;
+    flex-wrap: wrap !important;
+  }
+
+  .trial-modal-feature-publishing .trial-modal-platforms {
+    margin-left: 41px !important;
+  }
+}

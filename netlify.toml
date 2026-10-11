@@ -1,0 +1,80 @@
+[build]
+    command = "pnpm build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  SCENESMITH_ENABLE_GA = "false"
+
+[context.dev.environment]
+  SCENESMITH_ENABLE_GA = "false"
+
+[context.production.environment]
+  SCENESMITH_ENABLE_GA = "true"
+
+[context.deploy-preview.environment]
+  SCENESMITH_ENABLE_GA = "false"
+
+[context.branch-deploy.environment]
+  SCENESMITH_ENABLE_GA = "false"
+
+# The Netlify site is the public marketing origin. Customer authentication,
+# billing, provider callbacks, and MCP all run on the application origin.
+# Redirect application-looking paths instead of allowing Netlify to execute
+# the server routes without the VM's private production environment.
+[[redirects]]
+  from = "/login"
+  to = "https://app.scenesmith.design/login"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/register"
+  to = "https://app.scenesmith.design/register"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/app/*"
+  to = "https://app.scenesmith.design/app/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/api/auth/*"
+  to = "https://app.scenesmith.design/api/auth/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/auth/*"
+  to = "https://app.scenesmith.design/auth/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/api/integrations/*"
+  to = "https://app.scenesmith.design/api/integrations/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/api/oauth/*"
+  to = "https://app.scenesmith.design/api/oauth/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/api/mcp"
+  to = "https://app.scenesmith.design/api/mcp"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/.well-known/*"
+  to = "https://app.scenesmith.design/.well-known/:splat"
+  status = 301
+  force = true
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

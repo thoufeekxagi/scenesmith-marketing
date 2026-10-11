@@ -1,0 +1,35 @@
+# SceneSmith
+
+> SceneSmith is social media publishing and scheduling software for Instagram, X, and LinkedIn. Create posts in ChatGPT or another MCP-compatible client, or in the SceneSmith web composer. Review the exact draft, account, and time before approving a post to publish now or later.
+
+The public product site is https://scenesmith.design. The application is https://app.scenesmith.design. The application host is not the canonical marketing site.
+
+## Product
+
+- Create and edit platform-specific social posts from ChatGPT, compatible MCP clients, or the SceneSmith web composer.
+- Connect Instagram, X, and LinkedIn accounts to a workspace.
+- Preview the post and destination, then approve publishing or scheduling.
+- Use a calendar to review drafts, scheduled posts, published posts, and delivery status.
+- Keep brands and their connected accounts organized in separate workspaces.
+- Product and plan details: https://scenesmith.design/#pricing
+
+## Setup and help
+
+- Connection guides for ChatGPT, Codex, Cursor, VS Code, Devin, and other MCP-compatible clients: https://scenesmith.design/connections
+- MCP overview: https://scenesmith.design/mcp
+- Hosted MCP endpoint: https://app.scenesmith.design/api/mcp
+- Support: https://scenesmith.design/support
+- Security: https://scenesmith.design/security
+
+## Guides
+
+- Social media post automation with review and scheduling: https://scenesmith.design/blog/automate-social-media-posts
+- Schedule a LinkedIn post from ChatGPT: https://scenesmith.design/blog/chatgpt-linkedin-posts
+- Create Instagram posts from ChatGPT: https://scenesmith.design/blog/chatgpt-instagram-posts
+- All guides: https://scenesmith.design/blog
+
+## Policies
+
+- Privacy: https://scenesmith.design/privacy
+- Terms: https://scenesmith.design/terms
+- Data deletion: https://scenesmith.design/data-deletion
