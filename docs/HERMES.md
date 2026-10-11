@@ -82,7 +82,7 @@ duplicate intent, secret, or change outside the permitted content/image paths.
 5. After the owner reviews the preview, the owner submits an **Approve** review on the PR. The workflow reads that event from the trusted default branch, checks that the PR comes from a separate identity and changes only approved content/image paths, rechecks CI and the production site's Netlify preview status for the exact head commit, then squash-merges that same commit. New commits dismiss the old review and require a new preview and approval.
 6. Netlify publishes the merge from `main` to `https://scenesmith.design`. Confirm the deploy commit and live page before marking the run complete.
 
-The first pipeline PR is a bootstrap: the owner review workflow cannot run until it has merged into the default branch. The PR is owner-authored, so GitHub will not accept the owner's review of their own PR. Review its staging preview first, then the owner uses the one-time admin bypass to merge it. The default-branch ruleset still requires CI and Netlify's preview status. After this bootstrap, owner Code Owner approval is required for all PRs. Do not install Hermes until the ruleset and workflow are active.
+The publishing pipeline bootstrap is complete on `main` (PR #3, merge commit `15e0a972b91386e47da66b1564b2b8dc54c5cbfd`). The owner-authored bootstrap needed the one-time admin bypass because GitHub does not allow an author to approve their own PR. Do not repeat that bypass for routine content. The active ruleset and owner-review workflow now require a separate author identity, passing CI and Netlify preview status, and an owner approval for each content PR. Hermes is not yet connected; configure its separate repository-scoped GitHub App only after confirming these protections remain active.
 
 ## Search and indexing checks
 
@@ -91,6 +91,7 @@ The first pipeline PR is a bootstrap: the owner review workflow cannot run until
 - `/llms.txt`, `/llms-full.txt`, `/agent.md`, and `/agents.md` are generated from public marketing content. They help assistants discover and cite the site; they are not Google ranking or indexing guarantees.
 - `/site.xml` is not a second sitemap. Use the standard `/sitemap.xml` endpoint.
 - Submit the production sitemap once in Google Search Console and monitor its Sitemaps and Pages reports. Google says a sitemap is a discovery hint, not a guarantee of crawling, indexing, or ranking. The Indexing API is not a general blog-submission API; it is limited to eligible job-posting and livestream pages.
+- The SceneSmith sitemap was re-submitted in Search Console on 2026-10-11 after the pilot article went live. Google accepted the submission; allow its normal processing time before expecting the discovered-URL count to update. Do not re-submit it for every post unless the Search Console report shows a sitemap error.
 - After production, run `pnpm verify:live` to verify the article's 200 response, production canonical, image, Article/Breadcrumb/FAQ JSON-LD, sitemap `lastmod`, robots sitemap reference, text routes, and indexable production metadata. Check that the Netlify preview still reports `noindex`.
 
 ## Stop conditions
