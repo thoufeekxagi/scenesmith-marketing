@@ -13,7 +13,7 @@ The only Git remote for this checkout is `thoufeekxagi/scenesmith-marketing`. Do
 5. The trusted GitHub workflow checks that the reviewer is the repository owner, the review matches the current commit, the PR changes only article Markdown and blog images, and CI plus the Netlify preview passed for that same commit. It then squash-merges the PR.
 6. Netlify sees the approved merge on `main` and deploys it to production. We verify the live URL and SEO endpoints after the deploy.
 
-The owner-authored bootstrap PR cannot be approved by its author, and the review workflow is not available until it has merged to `main`. Its staging preview must be reviewed first; the repository owner then uses the one-time admin bypass to merge that bootstrap PR. The default-branch ruleset still requires CI and Netlify's preview status. After this bootstrap, Hermes-authored content PRs require a current owner review and the workflow auto-merges only the allowed content and image paths. The owner-only admin bypass remains available for exceptional maintenance PRs, not for Hermes.
+The owner-authored bootstrap PR could not be approved by its author, and the review workflow was not available until it merged to `main`. That one-time bootstrap is complete. Routine Hermes content PRs must come from a separate GitHub identity, require a current owner review, and auto-merge only the allowed content and image paths after CI and Netlify preview checks pass. The owner-only admin bypass is for exceptional maintenance PRs, not routine publishing.
 
 The extra Netlify project `scenesmith-marketing-preview` is unlinked and unused. The staging step uses a PR Deploy Preview from the existing `scene-smith-website` project, keeping the current production Git link and domain in place.
 
@@ -44,7 +44,9 @@ The first article is `content/posts/schedule-linkedin-posts-free/README.md`, tar
 
 The guide answers the free/native path before mentioning SceneSmith. It distinguishes LinkedIn profile scheduling (10 minutes to three months ahead) from Page scheduling (one hour to three months, with Page admin permissions), and cites LinkedIn's current help pages. The primary intent is distinct from the existing guide about drafting and scheduling from ChatGPT. An original, brand-colored 1200 × 631 WebP cover is included at `public/blog/schedule-linkedin-posts-free.webp` (about 24 KB). The raw Hermes JSON, CSV, and Search Console report are not committed to this public repository.
 
-The canonical article URL after production approval will be `https://scenesmith.design/blog/schedule-linkedin-posts-free`. It is not live in production until the owner approves the staging preview and the PR merges.
+The canonical article is live at [`https://scenesmith.design/blog/schedule-linkedin-posts-free`](https://scenesmith.design/blog/schedule-linkedin-posts-free). It was published from approved PR #3, merge commit `15e0a972b91386e47da66b1564b2b8dc54c5cbfd`, on 2026-10-11. The production verifier confirmed the article response, index directives, image, structured data, sitemap entry, robots sitemap reference, and agent text routes. The PR staging preview remains `noindex` and canonicalizes to the production domain.
+
+The publishing pipeline and production approval workflow are active on `main`. Hermes itself is **not yet connected or scheduled**: install a separate, repository-scoped GitHub App identity and configure its daily job by following [the Hermes procedure](docs/HERMES.md). Until then, content must be submitted by another authorized GitHub identity. No Hermes, Netlify, Search Console, app/server, or VM credentials are configured in this repository.
 
 ## Local verification
 
