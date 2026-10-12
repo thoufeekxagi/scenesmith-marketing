@@ -1,6 +1,7 @@
 import {guides} from "../../lib/blog";
 import {allPosts} from "../../lib/posts";
 import {SITE_DESCRIPTION, SITE_URL} from "../../lib/seo";
+import {videoTextReference} from "../../lib/post-media.mjs";
 
 export const dynamic = "force-static";
 
@@ -35,7 +36,8 @@ export function GET() {
     `Summary: ${post.description}`,
     ...(post.image ? [`Image: ${SITE_URL}${post.image}`, `Image description: ${post.imageAlt ?? ""}`] : []),
     "",
-    post.body
+    post.body,
+    ...post.videos.map(videoTextReference)
   ].join("\n"));
 
   const body = [

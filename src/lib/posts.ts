@@ -3,6 +3,7 @@ import {join} from "node:path";
 import {parsePostSource} from "./post-frontmatter.mjs";
 import {extractPostFaq} from "./post-faq.mjs";
 import type {PostFaq} from "./post-faq.mjs";
+import {parsePostVideos} from "./post-media.mjs";
 
 const postsDirectory = join(process.cwd(), "content", "posts");
 
@@ -17,6 +18,7 @@ export type MarkdownPost = {
   readTime: string;
   body: string;
   faqs: PostFaq[];
+  videos: ReturnType<typeof parsePostVideos>;
   image?: string;
   imageAlt?: string;
 };
@@ -55,6 +57,7 @@ export function allPosts(): MarkdownPost[] {
         readTime: `${Math.max(1, Math.ceil(words / 220))} min read`,
         body: content,
         faqs: extractPostFaq(content),
+        videos: parsePostVideos(content),
         image,
         imageAlt: data.imageAlt
       };

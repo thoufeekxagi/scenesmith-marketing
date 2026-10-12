@@ -23,6 +23,10 @@ for (const path of ["/login", "/register", "/app/*", "/api/mcp", "/.well-known/*
   if (!config.includes(`from = "${path}"`)) failures.push(`missing application redirect: ${path}`);
 }
 
+const nextConfig = readFileSync(join(root, "next.config.ts"), "utf8");
+if (!nextConfig.includes("img-src 'self' data: https://i.ytimg.com;")) failures.push("CSP must allow only the YouTube thumbnail host for remote images");
+if (!nextConfig.includes("frame-src https://js.stripe.com https://hooks.stripe.com https://www.youtube-nocookie.com;")) failures.push("CSP must allow the YouTube no-cookie player frame");
+
 if (failures.length) {
   failures.forEach((failure) => console.error(`FAIL ${failure}`));
   process.exit(1);

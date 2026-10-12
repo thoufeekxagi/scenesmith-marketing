@@ -1,3 +1,5 @@
+import {listMermaidPosts, listVideoPosts} from "./content-videos.mjs";
+
 const args = process.argv.slice(2);
 const preview = args.includes("--preview");
 let origin = "https://scenesmith.design";
@@ -13,6 +15,7 @@ if (preview) {
 const slug = "schedule-linkedin-posts-free";
 const articleUrl = `${origin}/blog/${slug}`;
 const failures = [];
+const videoPosts = listVideoPosts();
 
 async function get(path) {
   const response = await fetch(`${origin}${path}`, {redirect: "follow", signal: AbortSignal.timeout(20_000)});
@@ -30,6 +33,9 @@ if (preview ? !/\bnoindex\b/i.test(robotsMeta) : /\bnoindex\b/i.test(robotsMeta)
 if (!/<meta\s+name="googlebot"\s+content="[^"]*max-snippet:-1/i.test(html)) failures.push("production article is missing max-snippet:-1 Googlebot metadata");
 if (!html.includes("How to Schedule LinkedIn Posts for Free")) failures.push("article title is missing from production HTML");
 if (!html.includes('class="blog-post-cover"')) failures.push("article cover image is missing from production HTML");
+const csp = articleResponse.headers.get("content-security-policy") ?? "";
+if (!csp.includes("frame-src https://js.stripe.com https://hooks.stripe.com https://www.youtube-nocookie.com")) failures.push("article response CSP is missing the YouTube no-cookie player frame");
+if (!csp.includes("img-src 'self' data: https://i.ytimg.com")) failures.push("article response CSP is missing the YouTube thumbnail host");
 
 let graph = [];
 for (const match of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
@@ -72,9 +78,49 @@ for (const [path, expected] of [
   if (!body.includes(expected)) failures.push(`${path}: expected public article/agent content is missing`);
 }
 
+for (const {slug: videoSlug, videos} of videoPosts) {
+  const {body: videoHtml} = await get(`/blog/${videoSlug}`);
+  if (!videoHtml.includes('class="blog-video"') || videos.some((video) => !videoHtml.includes(`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`))) failures.push(`${videoSlug}: responsive video player thumbnail markup is missing`);
+  let videoGraph = [];
+  for (const match of videoHtml.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+    try {
+      const data = JSON.parse(match[1]);
+      if (Array.isArray(data?.["@graph"])) videoGraph = videoGraph.concat(data["@graph"]);
+      else videoGraph.push(data);
+    } catch {
+      failures.push(`${videoSlug}: video article contains invalid JSON-LD`);
+    }
+  }
+  for (const video of videos) {
+    if (!videoHtml.includes(`https://www.youtube.com/watch?v=${video.id}`) || !videoHtml.includes(">Watch on YouTube</a>")) {
+      failures.push(`${videoSlug}: the plain Watch on YouTube link is missing`);
+    }
+    const videoObject = videoGraph.find((item) => item?.["@type"] === "VideoObject" && item.name === video.title);
+    if (video.uploaded && video.duration && !videoObject) failures.push(`${videoSlug}: VideoObject schema is missing despite supplied upload date and duration`);
+    if ((!video.uploaded || !video.duration) && videoObject) failures.push(`${videoSlug}: VideoObject schema was emitted without complete supplied metadata`);
+    if (videoObject && (videoObject.uploadDate !== video.uploaded || videoObject.duration !== video.duration || videoObject.thumbnailUrl !== `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg` || videoObject.embedUrl !== `https://www.youtube-nocookie.com/embed/${video.id}`)) {
+      failures.push(`${videoSlug}: VideoObject contains values that do not match the supplied video metadata`);
+    }
+  }
+}
+
+for (const {slug: diagramSlug} of listMermaidPosts()) {
+  const {body: diagramHtml} = await get(`/blog/${diagramSlug}`);
+  if (!diagramHtml.includes('class="blog-mermaid"')) failures.push(`${diagramSlug}: Mermaid diagram rendering container is missing`);
+}
+
+if (videoPosts.length) {
+  const [{body: fullText}, {body: agentIndex}] = await Promise.all([get("/llms-full.txt"), get("/agents.md")]);
+  for (const {videos} of videoPosts) for (const video of videos) {
+    const line = `Video: https://www.youtube.com/watch?v=${video.id} (${video.title})`;
+    if (!fullText.includes(line)) failures.push(`/llms-full.txt is missing ${line}`);
+    if (!agentIndex.includes(line)) failures.push(`/agents.md is missing ${line}`);
+  }
+}
+
 if (failures.length) {
   failures.forEach((failure) => console.error(`FAIL ${failure}`));
   process.exit(1);
 }
 
-console.log(`${preview ? "Deploy Preview" : "Production"} SEO checks passed for ${articleUrl}: page, index directives, image, structured data, sitemap, robots, and agent text routes.`);
+console.log(`${preview ? "Deploy Preview" : "Production"} SEO checks passed for ${articleUrl}: page, index directives, image, structured data, sitemap, robots, CSP, and agent text routes.${videoPosts.length ? ` Verified ${videoPosts.length} video article(s).` : " No published video article is present to check yet."}`);

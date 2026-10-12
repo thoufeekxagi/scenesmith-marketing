@@ -1,4 +1,6 @@
 import type {PostFaq} from "./post-faq.mjs";
+import type {MarkdownPost} from "./posts";
+import {videoObjectSchema} from "./video-schema.mjs";
 import {SITE_URL} from "./seo";
 
 type BlogStructuredData = {
@@ -11,6 +13,7 @@ type BlogStructuredData = {
   updated: string;
   image?: string;
   faqs?: PostFaq[];
+  videos?: MarkdownPost["videos"];
 };
 
 export function blogStructuredData(article: BlogStructuredData) {
@@ -38,6 +41,8 @@ export function blogStructuredData(article: BlogStructuredData) {
       ]
     }
   ];
+
+  graph.push(...videoObjectSchema(url, article.videos ?? []));
 
   if (article.faqs?.length) {
     graph.push({

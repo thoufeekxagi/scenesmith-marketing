@@ -2,6 +2,7 @@ import {existsSync, readFileSync, readdirSync, statSync} from "node:fs";
 import {join} from "node:path";
 import {parsePostSource} from "../src/lib/post-frontmatter.mjs";
 import {extractPostFaq} from "../src/lib/post-faq.mjs";
+import {inspectPostMedia} from "../src/lib/post-media.mjs";
 
 const root = join(process.cwd(), "content", "posts");
 const legacySlugs = new Set(["automate-social-media-posts", "chatgpt-linkedin-posts", "chatgpt-instagram-posts"]);
@@ -61,7 +62,17 @@ for (const {name: slug} of posts) {
     if (typeof data.imageAlt !== "string" || data.imageAlt.trim().length < 12) failures.push(`${label}: imageAlt must describe the image for readers using assistive technology`);
   }
   if (data.primaryKeyword !== undefined && (typeof data.primaryKeyword !== "string" || data.primaryKeyword.trim().length < 3)) failures.push(`${label}: primaryKeyword must be a useful phrase`);
-  if (/<!--|<\/?[A-Za-z][^>]*>/.test(content)) failures.push(`${label}: raw HTML is not allowed; use Markdown`);
+  for (const issue of inspectPostMedia(content).issues) failures.push(`${label}: ${issue}`);
+  for (const [, alt, imageUrl] of content.matchAll(/!\[([^\]]*)\]\(([^\s)]+)(?:\s+"[^"]*")?\)/g)) {
+    if (alt.trim().length < 12) failures.push(`${label}: each article image needs descriptive alt text of at least 12 characters`);
+    if (!/^\/blog\/[a-z0-9][a-z0-9._-]*\.(?:webp|png|jpe?g)$/i.test(imageUrl)) {
+      failures.push(`${label}: article images must be local /blog/ WebP, PNG, or JPEG files`);
+      continue;
+    }
+    const imagePath = join(process.cwd(), "public", imageUrl.slice(1));
+    if (!existsSync(imagePath)) failures.push(`${label}: article image ${imageUrl} does not exist under public/`);
+    else if (statSync(imagePath).size > 2_000_000) failures.push(`${label}: article image ${imageUrl} must be 2 MB or smaller`);
+  }
 }
 
 if (failures.length) {
