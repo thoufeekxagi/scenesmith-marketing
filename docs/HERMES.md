@@ -53,6 +53,12 @@ a quota. Confirm the query is not already answered, verify product claims from
 the public marketing site and primary sources, and keep raw research exports
 out of this public repository. Put each article in
 content/posts/<slug>/README.md and original article images only in public/blog/.
+When the owner supplies screenshots, use local Markdown images with descriptive
+alt text below the matching numbered steps. When the owner supplies a YouTube
+link, use only the documented ::video directive and include only verified or
+owner-supplied metadata. Use a safe Mermaid fence only when a diagram helps.
+All three media types are optional; omit them when they are not supplied or
+useful. Never add raw HTML, iframe, script, arbitrary video hosts, or SVG.
 Do not edit site code, workflows, configuration, redirects, or any app/server
 files. Run pnpm install --frozen-lockfile, pnpm validate:content,
 pnpm test:content-safety, pnpm typecheck, SCENESMITH_NOINDEX=true pnpm build,
@@ -65,24 +71,51 @@ Stop and report any failed check, product claim without a primary source,
 duplicate intent, secret, or change outside the permitted content/image paths.
 ```
 
+## Optional screenshots, YouTube, and diagrams
+
+These blocks are optional. If the owner supplies no video or screenshots and a diagram does not help, publish a normal Markdown article with none of them. Keep the complete publishing run within the current routine paths: article READMEs and original images under `public/blog/`. The 12 changed-file cap and the workflow path rules remain in force.
+
+- **Screenshots:** save supplied screenshots under `public/blog/` as WebP, PNG, or JPEG, no larger than 2 MB each. Use local Markdown image syntax with useful alt text of at least 12 characters. In a numbered tutorial, put one matching screenshot directly below each step that has an image. Callout numbers/boxes should be part of the supplied image; explain the visible action in alt text. Do not add remote images or HTML image tags.
+- **YouTube:** use a clip only when the owner supplies its YouTube link. Extract the exact 11-character ID from a `youtube.com/watch?v=...`, `youtu.be/...`, or YouTube Shorts URL. Add one directive on its own line, with a short accessible title. There may be at most three directives in an article. Never use an iframe, raw embed HTML, a different video host, or a guessed video ID. `start` is whole seconds; `uploaded` is a verified `YYYY-MM-DD` date; `duration` is a verified ISO 8601 duration such as `PT4M30S`; `description` is one accurate sentence. Leave any unknown optional field out. Do not invent metadata to trigger structured data. VideoObject schema appears only if both `uploaded` and `duration` are present.
+- **Mermaid:** use a standard fenced block with the language label `mermaid`. Keep it to plain labels and normal Mermaid syntax. Do not use HTML labels, click actions, URL actions, or Mermaid configuration directives. The site renders the diagram in the browser and leaves its source available as text while it loads or if the diagram has an error.
+- **Crawler text:** the build adds one `Video: https://www.youtube.com/watch?v=<id> (<title>)` line beneath the article in `/llms-full.txt` and `/agents.md`. Do not edit those generated files by hand.
+
+Worked example (replace the example ID and assets with supplied material; do not publish placeholder image paths):
+
+````markdown
+1. **Choose the LinkedIn destination.** Confirm the correct account before continuing.
+   ![Step 1 screenshot showing the selected LinkedIn account and its name](/blog/linkedin-guide-step-1.webp)
+
+::video[abcdefghijk]{title="Review the LinkedIn publishing flow" start="30" uploaded="2026-10-12" duration="PT4M30S" description="A walkthrough of reviewing a LinkedIn post before publishing."}
+
+```mermaid
+flowchart LR
+  Draft --> Preview --> HumanApproval --> Publish
+```
+````
+
+The example is documentation; it is not an article file. Use only metadata confirmed from the owner's video. If `uploaded` or `duration` is unknown, omit that value and no VideoObject is emitted.
+
 ## Daily research and writing
 
 1. Pull `main`. Review the existing blog and sitemap, recent marketing PRs, current product facts, the latest Hermes handoff, and primary documentation for the topic.
 2. Choose one question the site can answer with first-hand product facts or authoritative sources. Check whether an existing page already satisfies that intent. Update nothing and publish zero posts when the evidence or topic is weak.
 3. Treat Hermes scores as a triage signal, not a forecast. Record the source, date, geography, and any data collection failure. Do not describe estimated values as measured Google search volume. Keep raw Search Console and paid research exports outside this public repository.
-4. Write `content/posts/<slug>/README.md` from `content/TEMPLATE.md`. State the answer first; include practical steps, relevant limits, a way to verify, internal links, and exact primary-source URLs. Use original, accurately described images only under `public/blog/`. Frontmatter accepts only allowlisted string fields; do not use JavaScript/YAML tags, aliases, or raw HTML. A post file is limited to 120 KB and an image to 2 MB.
+4. Write `content/posts/<slug>/README.md` from `content/TEMPLATE.md`. State the answer first; include practical steps, relevant limits, a way to verify, internal links, and exact primary-source URLs. Add optional screenshots, YouTube, and Mermaid only as described above. Frontmatter accepts only allowlisted string fields; do not use JavaScript/YAML tags, aliases, or raw HTML. A post file is limited to 120 KB and an image to 2 MB.
 5. Do not create near-duplicate pages to reach a posting target. A run may prepare up to three distinct, sourced drafts; daily volume is not a requirement.
 
 ## Staging, approval, and production
 
 1. Create a branch and open a PR against `main`. A routine content PR may contain only article `README.md` files under `content/posts/` and their images under `public/blog/`.
 2. GitHub Actions runs content validation, adversarial content safety checks, typecheck, the preview build with `SCENESMITH_NOINDEX=true`, and marketing-boundary verification. Netlify builds a Deploy Preview for the PR.
-3. Wait for both **Marketing CI / verify** and **netlify/scene-smith-website/deploy-preview** to pass. Run `node scripts/verify-live.mjs --preview <PR-number>`. The verifier constructs the fixed Netlify preview hostname from that number; it does not fetch an arbitrary URL. Open the preview and check the full article on desktop and mobile, its links, title, canonical, Article/Breadcrumb/FAQ JSON-LD, image/alt text, and noindex. Read the exact rendered article; a passing build is not editorial approval.
+3. Wait for both **Marketing CI / verify** and **netlify/scene-smith-website/deploy-preview** to pass. Run `node scripts/verify-live.mjs --preview <PR-number>`. The verifier constructs the fixed Netlify preview hostname from that number; it does not fetch an arbitrary URL. Open the preview and check the full article on desktop and mobile, its links, title, canonical, Article/Breadcrumb/FAQ/VideoObject JSON-LD when applicable, image/alt text, player and Watch link, Mermaid diagram, CSP, and noindex. Read the exact rendered article; a passing build is not editorial approval.
 4. Send the preview URL and the PR summary to the owner. Do not merge or publish while waiting.
 5. After the owner reviews the preview, the owner submits an **Approve** review on the PR. The workflow reads that event from the trusted default branch, checks that the PR comes from a separate identity and changes only approved content/image paths, rechecks CI and the production site's Netlify preview status for the exact head commit, then squash-merges that same commit. New commits dismiss the old review and require a new preview and approval.
 6. Netlify publishes the merge from `main` to `https://scenesmith.design`. Confirm the deploy commit and live page before marking the run complete.
 
-The publishing pipeline bootstrap is complete on `main` (PR #3, merge commit `15e0a972b91386e47da66b1564b2b8dc54c5cbfd`). The owner-authored bootstrap needed the one-time admin bypass because GitHub does not allow an author to approve their own PR. Do not repeat that bypass for routine content. The active ruleset and owner-review workflow now require a separate author identity, passing CI and Netlify preview status, and an owner approval for each content PR. Hermes is not yet connected; configure its separate repository-scoped GitHub App only after confirming these protections remain active.
+The owner-approval auto-merge workflow is intentionally limited to routine article-and-image PRs. A code, workflow, or publishing-policy change is a maintenance PR and does not meet that auto-merge allowlist; route it through the repository's normal maintainer code review and merge procedure. The routine Hermes publisher must not use its content-only approval gate to merge maintenance changes.
+
+The publishing pipeline bootstrap is complete on `main` (PR #3, merge commit `15e0a972b91386e47da66b1564b2b8dc54c5cbfd`). The owner-authored bootstrap needed the one-time admin bypass because GitHub does not allow an author to approve their own PR. Do not repeat that bypass for routine content. The active ruleset and owner-review workflow require a separate author identity, passing CI and Netlify preview status, and an owner approval for each content PR. Keep Hermes on its separate, repository-scoped GitHub App; it must create PRs but never approve or merge them.
 
 ## Search and indexing checks
 
