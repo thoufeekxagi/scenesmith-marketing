@@ -12,7 +12,7 @@ imageAlt: "A deep teal document with a folded corner and an orange tab, joined b
 
 The best AI tool for creating LinkedIn posts is the one that can also publish the post you approved: to the account you meant, at the time you chose, with a record you can check afterwards. Writing the text is the easy half, and ChatGPT already does it well. The other half is where most tools fall short, and it is the half that decides whether you gain time or just gain a copy-paste step.
 
-That gap is easy to see in OpenAI's own listings. The LinkedIn plugin that OpenAI lists for ChatGPT, read on 21 October 2026, is a profile lookup: it returns a person's title, company, location and follower count and links to the profile. It has no post, schedule or message action. A tool can carry the LinkedIn name, sit inside the chat you write in, and still be unable to put a single word on your feed.
+That gap is easy to see in OpenAI's own listings. The LinkedIn plugin that OpenAI lists for ChatGPT, read on 21 October 2026, is a profile lookup: it returns a person's title, company, location and follower count and links to the profile. Neither its description nor its three example prompts mention posting, scheduling or messaging anything. A tool can carry the LinkedIn name, sit inside the chat you write in, and still be unable to put a single word on your feed.
 
 So judge a candidate on five things, in this order. Each one fails before the next one becomes relevant.
 
@@ -89,7 +89,7 @@ Where it is not the answer: if you write your own words and only need a queue, L
 
 ### Can the LinkedIn plugin in ChatGPT post to my LinkedIn account?
 
-No. On 21 October 2026, OpenAI's listing for the LinkedIn plugin, developed by LinkedIn, describes a profile lookup that returns a person's title, company, location and follower count and links to their profile. Its example actions are attendee briefs, profile verification and speaker background checks. There is no post, schedule or message action, so a plugin can be first-party and still not publish.
+No. On 21 October 2026, OpenAI's listing for the LinkedIn plugin, developed by LinkedIn, describes a profile lookup that returns a person's title, company, location and follower count and links to their profile. Its example prompts are attendee briefs, profile verification and speaker background checks; none of them publishes a post. A plugin can be first-party and still not publish.
 
 ### Do I need a paid ChatGPT plan to connect a tool that posts?
 
