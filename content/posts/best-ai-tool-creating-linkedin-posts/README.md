@@ -56,14 +56,14 @@ Scheduled is not published. The queue entry, the API response and the live post 
 
 ## What the four routes actually give you
 
-| Route | Drafts in the chat | Publishes to LinkedIn | Review before it goes live | Setup |
-| --- | --- | --- | --- | --- |
-| ChatGPT alone | Yes | No | Not applicable | None |
-| A separate scheduler | No, you paste the text in | Yes | You review the composed post | An account |
-| LinkedIn's own composer | No | Yes, for posts you write there | You see the text and the time | None, and it is free |
-| ChatGPT plus a custom MCP connector with post tools | Yes | Yes | You approve each write action | A connector, OAuth, and a plan that allows custom MCP servers |
+Read each route against the five checks, because they do not all clear the same ones.
 
-One plan note belongs in this table rather than in a footnote. OpenAI's help page on connecting custom MCP servers, read on 21 October 2026, states that custom MCP server connections and full MCP support are available for ChatGPT Business and Enterprise/Edu customers on ChatGPT web, and that only admins and owners can create and publish those plugins for a Business workspace. If you are on a different plan, check what your own client offers before you build a routine around it; [which plan and surface you need](/blog/chatgpt-mcp-support) walks through that question.
+- **ChatGPT alone.** It drafts well and publishes nothing. Nothing to approve because nothing leaves the chat; you copy the text into LinkedIn yourself.
+- **LinkedIn's own composer.** You write the post there and schedule it free, from 10 minutes to three months ahead for a member or one hour to three months for a Page. You see the text and the time before it goes out, but the drafting happens outside the conversation.
+- **A separate scheduler.** It publishes the text you paste in, holds its own queue, and shows you the composed post before it goes live. The review step exists; the drafting step is still yours.
+- **ChatGPT plus a custom MCP connector that exposes post tools.** This is the only route that both drafts in the conversation and publishes with an approval you can read, because the write action carries its payload for confirmation. It also needs the most setup: a connector, an OAuth grant to the right destination, and a plan that allows custom MCP servers.
+
+That last setup point deserves a plain statement rather than a footnote. OpenAI's help page on connecting custom MCP servers, read on 21 October 2026, states that custom MCP server connections and full MCP support are available for ChatGPT Business and Enterprise/Edu customers on ChatGPT web, and that only admins and owners can create and publish those plugins for a Business workspace. If you are on a different plan, check what your own client offers before you build a routine around it; [which plan and surface you need](/blog/chatgpt-mcp-support) walks through that question.
 
 ## A ten-minute test before you commit
 
