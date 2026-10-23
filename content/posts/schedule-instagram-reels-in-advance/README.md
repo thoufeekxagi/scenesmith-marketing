@@ -10,7 +10,7 @@ image: "/blog/schedule-instagram-reels-in-advance-hero.webp"
 imageAlt: "A deep teal film-strip frame with a row of white sprocket holes across its top and bottom, a large vivid orange parallelogram overlapping its lower edge, and two small orange squares floating above it, on a cream background."
 ---
 
-Yes. Instagram schedules Reels inside its own app: tap **Create**, choose **Reel**, and under **More options** turn on **Schedule this reel** to pick a date and time. Instagram's help page documents a limit of **25 scheduled posts a day, up to 30 days in advance**, and it asks for a **public account** — not a professional one, which is the detail most guides get wrong.
+Yes. Instagram schedules Reels inside its own app: tap **Create**, choose **Reel**, and under **More options** turn on **Schedule this reel** to pick a date and time. Instagram's help page documents a limit of **25 scheduled posts a day, up to 30 days in advance**, and it asks for a **public account**, not a professional one.
 
 That covers the queue. It does not cover the writing, and it does not let you schedule from where you already work. If your drafts start in ChatGPT or Codex, the last section below shows the connector route, which keeps one approval step between the draft and the queue.
 
