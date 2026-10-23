@@ -7,7 +7,7 @@ published: "2026-10-23"
 updated: "2026-10-23"
 primaryKeyword: "how to schedule reels in advance"
 image: "/blog/schedule-instagram-reels-in-advance-hero.webp"
-imageAlt: "A deep teal film-strip frame with a row of white sprocket holes across its top and bottom, a large vivid orange parallelogram overlapping its lower edge, and two small orange squares floating above it, on a cream background."
+imageAlt: "Title card reading \"How to schedule Instagram Reels in advance\", subtitled Instagram app, Meta Planner, or ChatGPT and Codex, on a cream background with teal and orange shapes."
 ---
 
 Yes. Instagram schedules Reels inside its own app: tap **Create**, choose **Reel**, and under **More options** turn on **Schedule this reel** to pick a date and time. Instagram's help page documents a limit of **25 scheduled posts a day, up to 30 days in advance**, and it asks for a **public account**, not a professional one.
@@ -22,7 +22,7 @@ That covers the queue. It does not cover the writing, and it does not let you sc
 
 ## Step 1 — Confirm you are allowed to schedule at all
 
-![A deep teal key lying diagonally with a thick vivid orange ring around its shaft on a cream background.](/blog/schedule-instagram-reels-in-advance-step-01.webp)
+![Decision chart: the Instagram app needs a public account, Meta Business Suite Planner needs content permissions on the account, and a ChatGPT or Codex connector needs a professional business or creator account.](/blog/schedule-instagram-reels-in-advance-step-01.webp)
 
 Two different checks apply, depending on the route:
 
@@ -33,7 +33,7 @@ So the common claim that scheduling needs a professional account is only true fo
 
 ## Step 2 — Schedule the Reel in the Instagram app
 
-![A tall deep teal rounded rectangle like a phone screen with a large vivid orange play triangle in its centre and a small orange pill shape at its lower left on a cream background.](/blog/schedule-instagram-reels-in-advance-step-02.webp)
+![The seven in-app steps: tap Create then Reel, select the video and tap Next, add caption and effects, tap More options, turn on Schedule this reel and pick the date and time, tap Done then Back, then tap Schedule.](/blog/schedule-instagram-reels-in-advance-step-02.webp)
 
 The order matters, because the scheduling toggle is below the caption screen:
 
@@ -49,7 +49,7 @@ The same page notes that your scheduled content keeps the privacy and audience s
 
 ## Step 3 — Or schedule it in Meta Business Suite Planner
 
-![A deep teal calendar with a pale teal grid of cream day squares, one vivid orange square in the top row and two orange tabs above it, on a cream background.](/blog/schedule-instagram-reels-in-advance-step-03.webp)
+![Planner flow: select the Instagram account, click Planner, hover a day and click Schedule, filter to Reel and Instagram account, then use Options to reschedule or delete.](/blog/schedule-instagram-reels-in-advance-step-03.webp)
 
 Planner is Meta's calendar for a Page and an Instagram account together (help page read 2026-10-23):
 
@@ -63,7 +63,7 @@ Planner also shows content that Meta says was "scheduled in Meta Business Suite"
 
 ## Step 4 — Schedule the Reel from ChatGPT or Codex
 
-![A deep teal speech bubble with an orange arrow pointing right to a smaller vivid orange rounded rectangle on a cream background.](/blog/schedule-instagram-reels-in-advance-step-04.webp)
+![Sequence: you ask ChatGPT or Codex for the Reel, it calls create_draft, preview_draft shows you the exact text, media and time, you approve that version, schedule_draft sends the time and time zone, SceneSmith publishes to Instagram at that time, and get_delivery_status confirms it.](/blog/schedule-instagram-reels-in-advance-step-04.webp)
 
 This is the route for a caption that starts in a chat. SceneSmith's connector is a hosted MCP server at `https://app.scenesmith.design/api/mcp`, and [SceneSmith's connection page](/connections) (read 2026-10-23) lists ChatGPT, Codex, Cursor, VS Code and Devin as clients you can add it to. Claude is not on that list today, so no Claude instructions here.
 
