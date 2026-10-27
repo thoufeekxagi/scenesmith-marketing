@@ -1,7 +1,7 @@
 import type {Metadata} from "next";
 import Link from "next/link";
 import {notFound} from "next/navigation";
-import ReactMarkdown from "react-markdown";
+import {PostMarkdown} from "../../../components/post-markdown";
 import {SiteNav} from "../../../components/site-nav";
 import {SiteFooter} from "../../../components/site-footer";
 import {GuideVisual} from "../../../components/guide-visual";
@@ -10,6 +10,7 @@ import {allPosts, postBySlug} from "../../../lib/posts";
 import {articleMetadata, serializeJsonLd} from "../../../lib/seo";
 import {blogStructuredData} from "../../../lib/structured-blog";
 import "../blog.css";
+import "../media.css";
 
 type Params = {params: Promise<{slug: string}>};
 export function generateStaticParams() {return [...guides, ...allPosts()].map(({slug}) => ({slug}));}
@@ -36,7 +37,7 @@ export default async function GuidePage({params}: Params) {
       <nav className="blog-breadcrumb" aria-label="Breadcrumb"><Link href="/blog">Blog</Link><span aria-hidden="true">/</span><span aria-current="page">{post.title}</span></nav>
       <header className="guide-header"><span className="blog-eyebrow">{post.category.toUpperCase()}</span><h1>{post.title}</h1><p className="guide-deck">{post.description}</p><p className="guide-byline">By {post.author} · Updated {post.updated} · {post.readTime}</p></header>
       {post.image && <figure className="blog-post-cover"><img src={post.image} alt={post.imageAlt ?? ""} width="1200" height="631" /></figure>}
-      <div className="guide-body markdown-post"><ReactMarkdown skipHtml>{post.body}</ReactMarkdown></div>
+      <div className="guide-body markdown-post"><PostMarkdown markdown={post.body} /></div>
     </article><section className="blog-related"><h2>Keep reading</h2><div className="blog-grid">{[...allPosts(), ...guides].filter((item) => item.slug !== slug).slice(0, 3).map((item) => <Link className="blog-card" href={`/blog/${item.slug}`} key={item.slug}><span className="blog-card-category">{item.category}</span><h3>{item.title}</h3><p>{item.description}</p><span className="blog-card-link">Read the guide ↗</span></Link>)}</div></section></div><SiteFooter /></main>;
   }
   const structuredData = blogStructuredData({slug: guide.slug, title: guide.title, description: guide.description, category: guide.category, author: "Thoufeek Baber", published: BLOG_UPDATED, updated: BLOG_UPDATED, faqs: guide.faq});

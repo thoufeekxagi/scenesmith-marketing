@@ -17,7 +17,7 @@ const config: NextConfig = {
         {key: "X-Frame-Options", value: "DENY"},
         {key: "Referrer-Policy", value: "strict-origin-when-cross-origin"},
         {key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()"},
-        {key: "Content-Security-Policy", value: `default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self' https://checkout.stripe.com; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'${googleAnalyticsEnabled ? " https://www.googletagmanager.com" : ""}; connect-src 'self'${googleAnalyticsEnabled ? " https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com" : ""}; frame-src https://js.stripe.com https://hooks.stripe.com; font-src 'self' data:;`}
+        {key: "Content-Security-Policy", value: `default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self' https://checkout.stripe.com; img-src 'self' data: https://i.ytimg.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'${googleAnalyticsEnabled ? " https://www.googletagmanager.com" : ""}; connect-src 'self'${googleAnalyticsEnabled ? " https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com" : ""}; frame-src https://js.stripe.com https://hooks.stripe.com https://www.youtube-nocookie.com; font-src 'self' data:;`}
       ]
     }, {
       source: "/:path*",

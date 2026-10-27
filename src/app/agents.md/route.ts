@@ -1,12 +1,19 @@
 import {guides} from "../../lib/blog";
 import {allPosts} from "../../lib/posts";
 import {PUBLIC_PATHS, SITE_URL} from "../../lib/seo";
+import {videoTextReference} from "../../lib/post-media.mjs";
 
 export const dynamic = "force-static";
 
 export function GET() {
   const pages = PUBLIC_PATHS.map((path) => `- ${SITE_URL}${path === "/" ? "" : path}`);
-  const articles = [...guides, ...allPosts()].map(({slug, title}) => `- [${title}](${SITE_URL}/blog/${slug})`);
+  const articles = [
+    ...guides.map(({slug, title}) => [`- [${title}](${SITE_URL}/blog/${slug})`]),
+    ...allPosts().map((post) => [
+      `- [${post.title}](${SITE_URL}/blog/${post.slug})`,
+      ...post.videos.map((video) => `  - ${videoTextReference(video)}`)
+    ])
+  ].flat();
   const body = [
     "# Public content guide for agents",
     "",
