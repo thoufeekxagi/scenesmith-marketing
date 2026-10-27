@@ -12,7 +12,7 @@ imageAlt: "Title card reading \"Why ChatGPT asks for permission before an MCP to
 
 If ChatGPT asks for confirmation nearly every time your connected server runs a tool, that is usually the permission model doing its job, not a broken connection. OpenAI's help page for custom MCP servers (read 26 October 2026) says ChatGPT "may ask for confirmation based on app permissions and the action's context", that this applies to "write or modify actions", and that "some especially risky actions may be blocked instead of being presented for approval."
 
-Scheduling or publishing a post is a write action, so a publishing connector is the case that prompts most often. The question worth answering is which of the prompts you can actually remove. On ChatGPT, most of them are decided by the app's approved action list, which is admin-side, not by a switch in the chat.
+Scheduling or publishing a post is that kind of write action — it changes something outside the chat — so a publishing connector is the case that prompts most often. The question worth answering is which of the prompts you can actually remove. On ChatGPT, most of them are decided by the app's approved action list, which is admin-side, not by a switch in the chat.
 
 ## The four things that decide whether you see a prompt
 
@@ -50,7 +50,7 @@ That is the honest reason the prompt is not noise: it is the last gate before so
 
 Clients decide this from what the server advertises about each tool, not from the tool's name. OpenAI's agent approvals documentation (read 26 October 2026) says Codex "can also elicit approval for app (connector) tool calls that advertise side effects", and that "destructive app/MCP tool calls always require approval when the tool advertises a destructive annotation (unless the tool advertises a read annotation, which takes priority)".
 
-If you are testing the same server from a terminal, that page also documents the escape hatches that do exist there — `--ask-for-approval` policies and `-a never` — and the manual page for those is worth reading before you use them on an account that publishes.
+If you are testing the same server from a terminal, that page also documents the escape hatches that do exist there — `--ask-for-approval` policies and `-a never` — and the documentation for those is worth reading before you use them on an account that publishes.
 
 ## What no setting fixes
 
