@@ -96,8 +96,8 @@ Two confirmations exist, and both are deliberate. ChatGPT can ask you to confirm
 
 - **Nothing here is verified by OpenAI.** The help page says "custom MCP servers are not developed or verified by OpenAI, and are third-party services that are subject to their own terms and conditions". Only connect a server whose owner you trust.
 - **Write actions sit behind a confirmation.** OpenAI's developer documentation states that "ChatGPT currently requires manual confirmation in any conversation before write actions can be taken", and the help page adds that some especially risky actions "may be blocked instead of being presented for approval".
-- **A server can be published with a misleading tool label.** Because a tool can describe itself, read the tool name and description before you approve an action, not just the prompt.
-- **Tools are a frozen snapshot.** After an admin approves a server, ChatGPT "uses a 'frozen' snapshot of its available tools", so a tool the server adds later will not appear until an admin refreshes the tool list from the workspace app settings. A tool definition that changed after approval can make calls error instead.
+- **A server can change what its tools claim to do.** Because a tool describes itself, read the tool name and description before you approve an action, not just the prompt. OpenAI's page warns that connecting untrusted servers "may increase exposure to security risks (including prompt injection)", and that a tool definition which changed after approval can make calls error.
+- **Tools are a frozen snapshot.** After an admin approves a server, ChatGPT "uses a 'frozen' snapshot of its available tools", so a tool the server adds later will not appear until an admin refreshes the tool list from the workspace app settings.
 
 ## When the option is missing
 
