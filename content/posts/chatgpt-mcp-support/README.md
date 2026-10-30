@@ -1,47 +1,70 @@
 ---
-title: "Does ChatGPT support MCP? Which plan and surface you need"
-description: "OpenAI's current help page puts full MCP with write actions on Business and Enterprise/Edu web workspaces, and gives Pro read tools only. What to use."
+title: "How to add an MCP server to ChatGPT (and the plan you need)"
+description: "The current clicks for adding a custom MCP server in ChatGPT, which plan OpenAI documents, and what to do when your account cannot add one."
 category: "Publishing guide"
 author: "Thoufeek Baber"
 published: "2026-10-15"
-updated: "2026-10-15"
-primaryKeyword: "does chatgpt support mcp"
+updated: "2026-10-30"
+primaryKeyword: "how to add mcp server to chatgpt"
 image: "/blog/chatgpt-mcp-support-hero.webp"
 imageAlt: "A large deep teal rounded square joined by a vivid orange rounded block to a vivid orange crescent on a cream background."
 ---
 
-Yes. ChatGPT supports MCP servers, but the rules depend on which surface you use and which plan the account is on, and OpenAI's current rules are narrower than most tutorials suggest.
+OpenAI's help page for connecting custom MCP servers (read 2026-10-30) gives one current route inside ChatGPT: open **Plugins**, select the plus button, choose **Add custom MCP server**, enter the server's public HTTPS endpoint, set up authentication, acknowledge the risk warning, and select **Create as a plugin**. The same page says that in the current Plugins experience "you don't need to turn on Developer Mode first", which retires the step most older tutorials still lead with.
 
-OpenAI's help centre article [Connecting custom MCP servers in ChatGPT](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt) (read 2026-10-15; the page's own update marker read "Updated: 16 hours ago" at the time it was read) states that "Custom MCP server connections and full MCP support are available for ChatGPT Business and Enterprise/Edu customers on ChatGPT web." The same page answers the plan question in its FAQ: full MCP is "only available to Business and Enterprise/Edu users, currently", while a Pro account "can connect custom MCP servers with read/fetch permissions". Connecting your own server is also web-only: the page's answer for mobile is "No - web only".
+Two things decide whether that route exists for you. **Availability:** the page states that "Custom MCP server connections and full MCP support are available for ChatGPT Business and Enterprise/Edu customers on ChatGPT web", and its FAQ adds that Pro users "can connect custom MCP servers with read/fetch permissions". **Surface:** the page's answer for mobile is "No - web only", so the phone app cannot add a server at all.
 
-That matters if your goal is publishing. Sending a post to Instagram, LinkedIn or X is a write action by definition, so a read/fetch connection cannot finish the job. The two paths that can are a Business or Enterprise/Edu workspace on ChatGPT web, where an admin connects and publishes the server for the team, or a client that connects to MCP servers directly — the ChatGPT desktop app, Codex, Cursor, VS Code or Devin, the clients listed in [SceneSmith's connection guide](/connections).
+If your account cannot add one, or you need a write action such as publishing a social post, the practical route is a client that holds its own MCP configuration. OpenAI's Model Context Protocol documentation lists the ChatGPT desktop app, Codex CLI and the IDE extension as clients that "support MCP servers and share MCP configuration for the same Codex host".
 
-## What OpenAI's documentation says today
+## The steps OpenAI documents today
 
-Four primary sources describe the current state, and they are worth reading in this order:
+The route below is the Plugins experience on ChatGPT web, quoted from the help page read on 2026-10-30. It assumes a Business or Enterprise/Edu workspace.
 
-- **Plan.** "Custom MCP server connections and full MCP support are available for ChatGPT Business and Enterprise/Edu customers on ChatGPT web" ([OpenAI Help Center](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt), read 2026-10-15). The FAQ adds that full MCP is only Business and Enterprise/Edu "currently", and that Pro users "can connect custom MCP servers with read/fetch permissions".
-- **Who can connect.** On Business, "only admins and owners can create and publish" plugins for custom MCP servers. On Enterprise/Edu, admins and owners create and test, admins can grant the creation permission with role-based access control, and "only admins and owners can publish apps for the workspace". Members of the workspace then use what an admin has published.
-- **Surfaces.** The same page states that connecting custom MCP servers is web-only. Separately, OpenAI's [Model Context Protocol page](https://learn.chatgpt.com/docs/extend/mcp.md) (read 2026-10-15) says that "ChatGPT web can use remote MCP-backed tools supplied by plugins" and that "the ChatGPT desktop app, Codex CLI, and IDE extension support MCP servers and share MCP configuration for the same Codex host".
-- **Write actions and confirmation.** OpenAI's [developer page on MCP servers](https://developers.openai.com/api/docs/mcp.md) (read 2026-10-15) states that "ChatGPT currently requires manual confirmation in any conversation before write actions can be taken", that some especially risky actions may be blocked instead of offered, and that custom MCP servers "are not developed or verified by OpenAI". The same page warns that a server can mislabel a write action as read-only, which is one reason to connect only servers you trust.
+1. **Confirm you are allowed to create the connection.** On Business, "only admins and owners can create and publish plugins for custom MCP servers". On Enterprise/Edu, admins and owners create and test, and admins can use role-based access control to grant selected members permission to create connections to custom MCP servers. The permission is named **Create plugins with MCPs**.
+2. **Open Plugins** in ChatGPT and select the plus button.
+3. **Select Add custom MCP server.** Enter a name and, optionally, a description.
+4. **Add the connection.** Paste the server's public HTTPS MCP endpoint. If the server runs on a private network, on-premises or on a developer machine, select **Tunnel** and choose an available Secure MCP Tunnel or enter its `tunnel_id` instead.
+5. **Configure authentication.** If the server uses OAuth, check first that your provider issues refresh tokens. OpenAI's page warns that without refresh-token renewal, "ChatGPT may lose access after the original authorization expires because refresh-token renewal may be unavailable", and users then have to reauthenticate.
+6. **Read the risk warning** and select the **I understand and want to continue** checkbox. Then select **Create as a plugin**.
+7. **Review the discovered tools and metadata**, then install the plugin, start a new conversation, type `@` in the prompt box and select the plugin. Try a prompt and confirm any action ChatGPT asks you to confirm.
+8. **Publish it for the workspace** if you are the admin rolling this out: Admin console → the workspace → Plugins → Manage Legacy Apps → Drafts → Publish. Enterprise/Edu admins can set which actions are allowed with **Configure Actions**, and who gets access with **Configure Access**.
 
-Two smaller details decide a lot of support tickets. First, local servers: ChatGPT connects to remote servers, and the help page's answer for a server running on a private network is to use Secure MCP Tunnel rather than expecting a local process to be reachable. Second, tool snapshots: after an admin approves a server, ChatGPT "uses a "frozen" snapshot of its available tools", so a server that later adds a tool will not show it until an admin refreshes the connection.
+There is also a legacy path, still documented: Workspace settings → Apps → Create for admins and owners, or user settings → Apps → Create for authorised users, then the endpoint and metadata, an authentication choice, **Scan Tools**, and **Create**. A legacy draft appears in Workspace Settings → Apps → Drafts, or under Settings → Apps → Enabled Apps with a **Dev** label. If you are following an older guide that starts with Security and login → Developer Mode, that article is describing the route OpenAI has since replaced.
 
-If you have read an older guide that tells you to switch on Developer Mode first, note what OpenAI's page says now: "In the current Plugins experience, add a custom MCP server directly from Plugins. You don't need to turn on Developer Mode first."
+## Which plan can add a custom MCP server
 
-## Three ways a server actually reaches ChatGPT
+This is where most attempts stop, so it is worth reading before you hunt for a missing button. These are the plan statements on the same help page, read 2026-10-30:
 
-The three routes look similar in a screenshot and behave differently in practice.
+- **Business:** custom MCP server connections and full MCP support are available on ChatGPT web. Only admins and owners create and publish; members use what an admin published.
+- **Enterprise/Edu:** the same availability, plus RBAC. Admins and owners create and test, admins can grant the creation permission to selected members, and "only admins and owners can publish apps for the workspace".
+- **Pro:** the FAQ says "Full MCP is only available for Business and Enterprise/Edu users, currently. Pro users can connect custom MCP servers with read/fetch permissions." Read/fetch means the assistant can look things up through the server; it cannot publish, because sending a post is a write action.
+- **Plus:** the article never uses the word. That is not a documented yes and not a documented no — it means OpenAI has not published a Plus rule on this page. Do not build a publishing workflow on the assumption that it works; check your own account for the plus button inside Plugins, and if it is not offered, treat Plus as unsupported for this task rather than as a bug.
+- **Deep research and company knowledge:** both are read/fetch only. OpenAI's FAQ says deep research can use custom apps "but for read/fetch actions only - not for write actions".
 
-- **A direct client connection.** In the ChatGPT desktop app, Codex CLI or an IDE extension, you add the server to that client's MCP configuration and reload it. OpenAI's MCP page lists both STDIO servers and Streamable HTTP servers, with bearer token or OAuth authentication. This route needs no workspace admin, which is why it is the fastest way to test whether a server does what its page claims.
-- **The plugin directory.** OpenAI's [Plugins page](https://learn.chatgpt.com/docs/plugins.md) (read 2026-10-15) says plugins "work in Chat and Work across ChatGPT on the web, desktop, and mobile, and in Codex in the ChatGPT desktop app", that Codex CLI also has a plugin browser, and that "the IDE extension doesn't support plugins". Anything discoverable there is one install away, but directory approval is separate from connecting a custom client. SceneSmith's own listing is still in review, so the directory route is not the one to plan around yet.
-- **A workspace custom connection on the web.** A Business or Enterprise/Edu admin opens Plugins, selects the plus button, chooses Add custom MCP server, pastes the server's HTTPS endpoint, configures authentication, acknowledges the risk warning, and creates the plugin. That is the route OpenAI documents for a team, and it is the only one that makes the tools available to colleagues without touching each person's client configuration.
+![A decision flowchart: adding MCP to ChatGPT splits on whether the workspace is Business, Enterprise or Edu; the yes branch goes to Plugins and Add custom MCP server, the no branch goes to a Codex host — desktop app, Codex CLI or IDE — and both paths end at authorize, then test.](/blog/chatgpt-mcp-support-route-by-plan.webp)
 
-## Which route fits your job
+## Add the server to a Codex host instead
 
-- **You publish from your own ChatGPT Pro account.** Custom MCP servers on the web are read/fetch only for Pro. Use a client that takes MCP servers directly — the ChatGPT desktop app, Codex, Cursor, VS Code or Devin — or draft in the assistant and finish in SceneSmith's own composer.
-- **Your team is on Business, Enterprise or Edu.** An admin or owner connects SceneSmith once from Plugins and publishes it for the workspace. Everyone else installs the published plugin and selects it in a conversation.
-- **You only need to look things up.** A read/fetch server is enough, and that is the case OpenAI currently documents for Pro and for deep research.
+A client connection is the route that works without a workspace admin, and it is the one to use when a plan limit or a personal account blocks the ChatGPT route.
+
+1. **Open the configuration.** The file is `~/.codex/config.toml`; you can also scope servers to one trusted project with `.codex/config.toml`. The ChatGPT desktop app, Codex CLI and the IDE extension share this configuration, so you set a server up once.
+2. **Add the server.** With the CLI:
+
+   ```bash
+   codex mcp add scenesmith --url https://app.scenesmith.design/api/mcp
+   ```
+
+   Or write the block yourself:
+
+   ```toml
+   [mcp_servers.scenesmith]
+   url = "https://app.scenesmith.design/api/mcp"
+   ```
+
+3. **Restart the client** so it reads the change, then confirm the server is registered with `codex mcp list`.
+4. **Authorise it.** A server that requires OAuth finishes the connection through a browser prompt; until that completes, the tool list can stay empty even though the endpoint is correct.
+
+OpenAI's developer documentation describes both STDIO servers and Streamable HTTP servers for these clients, with bearer token or OAuth authentication, so a hosted server and a locally run one are configured in the same place.
 
 ## Connect SceneSmith as an MCP server in four steps
 
@@ -67,34 +90,49 @@ Ask the assistant: `Show my SceneSmith setup status.` The reply should name the 
 
 ![A thick deep teal arrow pointing right across a large vivid orange rounded rectangle on a cream background.](/blog/chatgpt-mcp-support-step-04.webp)
 
-Two confirmations exist, and both are deliberate. ChatGPT asks for manual confirmation before a write action, and SceneSmith shows the exact draft, media, destination and time for approval before anything is published or scheduled. Read the version you are approving — the caption, the image or video, the handle and the time zone — then check the delivery record afterwards. A draft is not a scheduled post, and a scheduled post is not a published one; the [batch guide](/blog/batch-create-social-media-posts) walks through the same review order when you approve several drafts at once.
+Two confirmations exist, and both are deliberate. ChatGPT can ask you to confirm before a write action, and SceneSmith shows the exact draft, media, destination and time for approval before anything is published or scheduled. Read the version you are approving — the caption, the image or video, the handle and the time zone — then check the delivery record afterwards. A draft is not a scheduled post, and a scheduled post is not a published one; the [batch guide](/blog/batch-create-social-media-posts) walks through the same review order when you approve several drafts at once.
+
+## Check the connection before you trust it
+
+- **Nothing here is verified by OpenAI.** The help page says "custom MCP servers are not developed or verified by OpenAI, and are third-party services that are subject to their own terms and conditions". Only connect a server whose owner you trust.
+- **Write actions sit behind a confirmation.** OpenAI's developer documentation states that "ChatGPT currently requires manual confirmation in any conversation before write actions can be taken", and the help page adds that some especially risky actions "may be blocked instead of being presented for approval".
+- **A server can change what its tools claim to do.** Because a tool describes itself, read the tool name and description before you approve an action, not just the prompt. OpenAI's page warns that connecting untrusted servers "may increase exposure to security risks (including prompt injection)", and that a tool definition which changed after approval can make calls error.
+- **Tools are a frozen snapshot.** After an admin approves a server, ChatGPT "uses a 'frozen' snapshot of its available tools", so a tool the server adds later will not appear until an admin refreshes the tool list from the workspace app settings.
 
 ## When the option is missing
 
-- **The option is not there at all.** Check the plan and the surface first: connecting a custom MCP server is a Business and Enterprise/Edu feature on ChatGPT web, and the help page says it is web-only. On a personal Pro account, use a client that takes MCP servers directly.
+- **The plus button is not there.** Check the plan and the surface first: connecting a custom MCP server is documented for Business and Enterprise/Edu on ChatGPT web, and the page says it is web-only. On a personal account, use a client that takes MCP servers directly.
 - **You are not the admin.** On Business, only admins and owners create and publish custom connections. Ask an admin to review the risk warning and publish the server for the workspace.
-- **The server runs on your laptop or a private network.** ChatGPT connects to remote servers, not local processes. OpenAI's answer is Secure MCP Tunnel; the alternative is a client that starts a local STDIO server.
+- **The server runs on your laptop or a private network.** ChatGPT connects to remote servers, not local processes; OpenAI's answer is Secure MCP Tunnel. The alternative is a client that starts a local STDIO server.
 - **A tool you need is missing after an update.** The approved tool list is a frozen snapshot. An admin has to refresh the actions from the workspace app settings before the new tool appears.
-- **You tried the IDE extension and no plugin appeared.** The IDE extension supports MCP servers but not plugins, so add the endpoint as a remote MCP server there instead of looking for a directory entry.
-- **You are looking for SceneSmith in the plugin directory.** The public listing is still in review. The same production endpoint works now in the clients listed in the [connection guide](/connections), and [linking ChatGPT to Instagram](/blog/link-chatgpt-to-instagram) covers the Instagram-specific preconditions once the connection is live.
+- **You tried the IDE extension and no plugin appeared.** The IDE extension supports MCP servers, so add the endpoint as a remote MCP server in its configuration instead of looking for a directory entry.
+- **You are looking for SceneSmith in the plugin directory.** The public listing is still pending review, and approval is separate from connecting a custom client. The same production endpoint works now in the clients listed in the [connection guide](/connections); [linking ChatGPT to Instagram](/blog/link-chatgpt-to-instagram) covers the Instagram-specific preconditions once the connection is live.
 
 ## Questions readers ask
 
-### Does ChatGPT support MCP servers?
+### How do I add an MCP server to ChatGPT?
 
-Yes. OpenAI's current help page documents custom MCP server connections with full MCP support for ChatGPT Business and Enterprise/Edu workspaces on ChatGPT web, and its MCP documentation covers MCP servers in the ChatGPT desktop app, Codex CLI and the IDE extension. The restrictions are about plan, surface and who is allowed to publish the connection, not about whether MCP works.
+On ChatGPT web in a Business or Enterprise/Edu workspace, open **Plugins**, select the plus button, choose **Add custom MCP server**, enter the server's public HTTPS endpoint or a Secure MCP Tunnel, configure authentication, acknowledge the risk warning and select **Create as a plugin**. Older guides that start with Developer Mode describe a route OpenAI no longer requires.
 
-### Which ChatGPT plan do I need to publish to Instagram or LinkedIn from ChatGPT?
+### Do I need to turn on Developer Mode to add an MCP server?
 
-Publishing is a write action, and OpenAI's FAQ currently limits full MCP to Business and Enterprise/Edu users, with Pro accounts able to connect custom MCP servers "with read/fetch permissions" only. If you are not in one of those workspaces, use a client that takes MCP servers directly — the ChatGPT desktop app, Codex, Cursor, VS Code or Devin — or draft in the assistant and finish in SceneSmith's composer. The page does not state rules for every tier, so confirm the button exists in your own account before promising the workflow to anyone else.
+No. OpenAI's page says: "In the current Plugins experience, add a custom MCP server directly from Plugins. You don't need to turn on Developer Mode first." Developer Mode appears in older write-ups and in some tutorials still ranking for this question.
 
-### Can I connect a custom MCP server in the ChatGPT mobile app?
+### Does ChatGPT Plus support custom MCP servers?
 
-No. OpenAI's help page answers that question with "No - web only" for custom MCP server connections. Plugins that already exist are a different case: OpenAI's Plugins page says plugins work on the web, desktop and mobile, so you can use a published plugin on a phone even though you cannot add a new custom server there.
+OpenAI's help page does not say. It names Business and Enterprise/Edu for full MCP support and Pro for read/fetch connections, and the word Plus never appears in the article read on 2026-10-30. Treat Plus as undocumented for this task and check whether the add-server button appears in your own Plugins menu instead of assuming either answer.
+
+### Which plan can actually publish, not just look things up?
+
+Any plan where the connection has write actions, which today means the full MCP support OpenAI documents for Business and Enterprise/Edu on ChatGPT web. Pro is limited to read/fetch, and publishing a post is a write. If you are on a personal plan, connect the server to a Codex host — the desktop app, Codex CLI or IDE extension — where the connection is yours to configure.
+
+### Can I add a custom MCP server in the ChatGPT mobile app?
+
+No. OpenAI answers the mobile question with "No - web only" for custom MCP server connections. Plugins that already exist are a different case, so check whether you are adding a new server or using a published one before looking for the button on a phone.
 
 ### Can ChatGPT connect to an MCP server running on my own computer?
 
-Not directly. ChatGPT connects to remote MCP servers, according to the same help page, and OpenAI's suggested route for a server on a private network or a developer machine is Secure MCP Tunnel. Locally started STDIO servers belong to the client path — the desktop app, Codex CLI or an IDE extension — not to the website.
+Not directly. ChatGPT connects to remote MCP servers, and OpenAI's suggested route for a server on a private network or a developer machine is Secure MCP Tunnel. Locally started STDIO servers belong to the client path — the desktop app, Codex CLI or an IDE extension.
 
 ### Does ChatGPT publish a post as soon as the connector is connected?
 
@@ -102,12 +140,12 @@ No, and two approval steps sit in front of it. OpenAI states that ChatGPT requir
 
 ### Is SceneSmith's ChatGPT plugin published yet?
 
-No. SceneSmith's [connection guide](/connections) says the public directory listing is still in review and that approval is separate from connecting a custom MCP client. Until it is approved, connect the production endpoint `https://app.scenesmith.design/api/mcp` in a client that accepts a remote MCP server, or use the web composer. The [ChatGPT-to-LinkedIn connector guide](/blog/chatgpt-connector-to-linkedin) covers the destination side of the same connection.
+No. SceneSmith's [connection guide](/connections) says directory review is still pending and that approval is separate from connecting a custom MCP client. Until it is approved, connect the production endpoint `https://app.scenesmith.design/api/mcp` in a client that accepts a remote MCP server, or use the web composer. The [ChatGPT-to-LinkedIn connector guide](/blog/chatgpt-connector-to-linkedin) covers the destination side of the same connection.
 
 ## Sources
 
-- [OpenAI Help Center: Connecting custom MCP servers in ChatGPT](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt) — read 2026-10-15; the page carried the marker "Updated: 16 hours ago". Source for full MCP support being available to Business and Enterprise/Edu customers on ChatGPT web, the Pro read/fetch limit, who can create and publish, adding a server from Plugins without Developer Mode, the risks of write actions and confirmation prompts, Secure MCP Tunnel, the web-only answer for mobile, and the frozen tool snapshot.
-- [OpenAI: Model Context Protocol](https://learn.chatgpt.com/docs/extend/mcp.md) — read 2026-10-15. Source for "ChatGPT web can use remote MCP-backed tools supplied by plugins", for the desktop app, Codex CLI and IDE extension supporting MCP servers with shared configuration, and for the supported STDIO and Streamable HTTP server features.
-- [OpenAI: Plugins](https://learn.chatgpt.com/docs/plugins.md) — read 2026-10-15. Source for the universal plugin directory, plugins working in Chat and Work on web, desktop and mobile plus Codex in the desktop app, the Codex CLI plugin browser, and the IDE extension not supporting plugins.
-- [OpenAI: Building MCP servers for plugins and API integrations](https://developers.openai.com/api/docs/mcp.md) — read 2026-10-15. Source for the requirement of manual confirmation before write actions, for actions that may be blocked, for custom MCP servers being third-party services not verified by OpenAI, and for the warning that a server can mislabel a write action as read-only.
-- [SceneSmith: connection guide](/connections) — read 2026-10-15. Source for the production MCP endpoint, the clients listed today (ChatGPT, Codex, Cursor, VS Code, Devin), the OAuth step, the setup-status prompt, and the note that the public directory listing is still in review.
+- [OpenAI Help Center: Connecting custom MCP servers in ChatGPT](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt) — read 2026-10-30. Source for the Plugins → plus → Add custom MCP server steps, the Secure MCP Tunnel option, the OAuth refresh-token warning, the Business and Enterprise/Edu availability line, the Pro read/fetch FAQ answer, the web-only mobile answer, the confirmation and blocked-action wording, the frozen tool snapshot, and the risk warning that custom MCP servers are not verified by OpenAI.
+- [OpenAI: Model Context Protocol](https://learn.chatgpt.com/docs/extend/mcp.md) — read 2026-10-30. Source for the ChatGPT desktop app, Codex CLI and IDE extension supporting MCP servers and sharing one MCP configuration, the `~/.codex/config.toml` and project `.codex/config.toml` paths, and the STDIO and Streamable HTTP server options.
+- [OpenAI: Building MCP servers for plugins and API integrations](https://developers.openai.com/api/docs/mcp.md) — read 2026-10-30. Source for the requirement of manual confirmation before write actions, for custom MCP servers being third-party services not developed or verified by OpenAI, and for the warning that a server can mislabel a write action as read-only.
+- [SceneSmith: connection guide](/connections) — read 2026-10-30. Source for the production MCP endpoint, the clients listed today (ChatGPT, Codex, Cursor, VS Code, Devin), the OAuth step, the setup-status prompt, and the note that directory review is pending.
+- [SceneSmith: MCP server page](/mcp) — read 2026-10-30. Source for the production endpoint, the client configuration examples, and the note that directory review is separate from connecting a custom client.
