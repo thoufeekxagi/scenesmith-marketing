@@ -7,7 +7,7 @@ published: "2026-10-31"
 updated: "2026-10-31"
 primaryKeyword: "how to add an mcp server to codex"
 image: "/blog/codex-add-mcp-server-hero.webp"
-imageAlt: "Title card with the words How to add an MCP server to Codex over a deep teal and orange panel."
+imageAlt: "Title card reading How to add an MCP server to Codex on a cream background, with a large deep teal circle, an orange circle and a small teal rounded square."
 ---
 
 Add an MCP server to Codex with one command — `codex mcp add SERVER-NAME -- SERVER-COMMAND` — or by adding a `[mcp_servers.NAME]` table to `~/.codex/config.toml` when you need headers, OAuth or approval settings. Both routes write the same configuration file, and OpenAI's documentation says the ChatGPT desktop app, Codex CLI and the IDE extension share it for the same Codex host, so you configure a server once and switch clients without redoing it.
