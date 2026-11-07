@@ -4,13 +4,13 @@ description: "Post or schedule an Instagram Reel, carousel or single image from 
 category: "Publishing guide"
 author: "Thoufeek Baber"
 published: "2026-10-11"
-updated: "2026-10-11"
+updated: "2026-11-07"
 primaryKeyword: "post to instagram from chatgpt codex"
 image: "/blog/codex-instagram-publishing-hero.webp"
 imageAlt: "Codex CLI window on the left, SceneSmith draft card in the middle, Instagram post preview on the right."
 ---
 
-Yes. You can post to Instagram from OpenAI Codex by connecting Codex to the hosted SceneSmith MCP server: Codex drafts and previews the post, you approve the exact version, and SceneSmith publishes it to Instagram. Codex supports remote Streamable HTTP MCP servers on every plan including Free, so the setup is the same whether you use Codex CLI, the Codex IDE extension, or the ChatGPT desktop app.
+Yes. You can post to Instagram from OpenAI Codex by connecting Codex to the hosted SceneSmith MCP server: Codex drafts and previews the post, you approve the exact version, and SceneSmith publishes it to Instagram. Codex reaches remote Streamable HTTP MCP servers through one shared `config.toml`, so the MCP setup is the same whether you use the Codex CLI, the Codex IDE extension, or the Codex app in the ChatGPT desktop app. OpenAI's Codex MCP docs state no plan restriction for adding a server (read 2026-11-07). Plugins are a different route and do not reach every surface: the IDE extension has no plugin browser at all.
 
 This guide shows the exact Codex setup, the Instagram account type you need (Business or Creator, linked to a Facebook Page), a safe first test, and how to fix the failures that stop most Codex → Instagram attempts.
 
@@ -42,21 +42,42 @@ The Codex MCP configuration lives in `~/.codex/config.toml`. The ChatGPT desktop
    ```
 
    The `[mcp_servers.scenesmith]` block matches the Streamable HTTP transport that the [OpenAI Codex MCP docs](https://learn.chatgpt.com/docs/extend/mcp) document. If you want a per-project scope, drop the same block into a trusted project's `.codex/config.toml` instead.
-2. Restart Codex (CLI, IDE extension, or the desktop app) so it picks up the new server.
-3. Confirm the server is registered:
+2. Log in if Codex asks for it. OpenAI's Codex MCP docs (read 2026-11-07) document an OAuth login for servers that need one:
+
+   ```bash
+   codex mcp login scenesmith
+   ```
+
+   On a terminal without a local browser, add `--no-browser` and open the printed URL instead. If no login prompt appears and a browser window opens on your first tool call, complete it there and re-run the setup-status prompt below. SceneSmith holds the resulting credential; Codex never sees a Meta token.
+3. Restart Codex (CLI, IDE extension, or the desktop app) so it picks up the new server.
+4. Confirm the server is registered:
 
    ```bash
    codex mcp list
    ```
 
    `scenesmith` should appear with the `https://app.scenesmith.design/api/mcp` URL and an `enabled` flag.
-4. Run a setup-status check in Codex:
+5. Run a setup-status check in Codex:
 
    ```text
    Show my SceneSmith setup status.
    ```
 
    This is the same first prompt SceneSmith's [ChatGPT connection section](/connections) recommends. The MCP server returns the Google identity, the workspace handle, and the destination handles you have authorised (Instagram, X and LinkedIn).
+
+### Do you need a Codex plugin or skill instead?
+
+OpenAI documents three installable things on the Codex side, and they do not cover the same surfaces. OpenAI's Codex plugin docs (read 2026-11-07) say plugins bundle skills and MCP servers, and that ChatGPT and Codex share one universal plugin directory. The plugin browser lives in the ChatGPT desktop app and, in the CLI, behind `/plugins`. The same page states plainly that the IDE extension doesn't support plugins. OpenAI's Codex skills docs (read 2026-11-07) put standalone skills in the ChatGPT desktop app, the Codex CLI and the IDE extension.
+
+![Diagram on a cream background: a teal box labelled Codex install routes branches by three arrows into a teal box Plugin: app and CLI, a teal box Skill: app, CLI, IDE, and an orange box MCP: all three surfaces, which points down to a second orange box labelled SceneSmith route.](/blog/codex-instagram-publishing-install-routes.webp)
+
+So the answer depends on which Codex you are in:
+
+- **Plugin browser in the ChatGPT desktop app or Codex CLI:** that route exists, but SceneSmith is not something you can install from it yet. A public directory listing is a separate approval step from the MCP server, and SceneSmith's [MCP page](/mcp) tracks that status. Do not wait on it; the server below works today.
+- **Codex IDE extension:** there is no plugin browser to look for. This is the surface where the plugin route simply does not apply, and it is the reason the setup below is written as `config.toml` plus `codex mcp add` rather than as a plugin install.
+- **A skill:** a skill is the authoring format a plugin packages, and standalone skills do work in all three surfaces. SceneSmith publishes no skill, so wrapping the MCP tools yourself would be custom work, not a supported install path.
+
+The MCP server is the route this guide uses because it is the same `config.toml` entry on the CLI, the IDE extension and the desktop app, and it needs no directory approval.
 
 ### Connect Instagram inside SceneSmith
 
@@ -115,7 +136,7 @@ Only confirm the draft when all four match. If anything is wrong, edit the draft
 
 **"Facebook Page not connected to the Instagram account"** — open the Facebook Page connected to that Instagram account and confirm it is published, not in draft mode. SceneSmith needs the Page ID during OAuth.
 
-**"MCP server not reachable"** from Codex — confirm the URL is `https://app.scenesmith.design/api/mcp` with no trailing slash, that you restarted Codex after editing `config.toml`, and that your network can reach `app.scenesmith.design`. The Codex docs treat a Streamable HTTP MCP server as reachable from Anthropic's or OpenAI's cloud, not from your machine.
+**"MCP server not reachable"** from Codex — confirm the URL is `https://app.scenesmith.design/api/mcp` with no trailing slash, that you restarted Codex after editing `config.toml`, and that your network can reach `app.scenesmith.design`. A Streamable HTTP server is reached at an address rather than started as a local process, which is why the same URL is used by the CLI, the IDE extension and the desktop app ([Codex MCP docs](https://learn.chatgpt.com/docs/extend/mcp), read 2026-11-07).
 
 **"OAuth required"** — Codex opened the server but SceneSmith needs you to log in. Follow the browser prompt SceneSmith returns and complete the OAuth flow there. The token is stored on the SceneSmith side; Codex only sees the bearer credential for the current session.
 
@@ -135,7 +156,7 @@ Yes. Connect Codex to the SceneSmith MCP server (`https://app.scenesmith.design/
 
 ### Does Codex need a paid OpenAI plan to post to Instagram?
 
-No. Codex's Streamable HTTP MCP support works on every plan that ships the Codex CLI, IDE extension, or ChatGPT desktop app, including the Free plan. The MCP server is remote HTTP, so the request comes from OpenAI's infrastructure, not from your machine, and you do not need to install an NPX package locally.
+OpenAI's Codex MCP docs state no plan requirement for adding an MCP server (read 2026-11-07), so a paid tier is not documented as a gate for the setup in this guide. The plugin directory is a different route with its own surfaces and availability; the MCP server is the one this guide uses, and it is remote HTTP, so you do not install an NPX package locally.
 
 ### What Instagram account type do I need?
 
@@ -163,7 +184,11 @@ Open the Facebook Page connected to your Instagram account, publish it, then rec
 
 ### Can I use the Codex IDE extension or the ChatGPT desktop app instead of the CLI?
 
-Yes. Codex CLI, the Codex IDE extension, and the ChatGPT desktop app all read the same `~/.codex/config.toml`. Add the `[mcp_servers.scenesmith]` block once and the same SceneSmith connection works in all three.
+Yes for the MCP server. Codex CLI, the Codex IDE extension, and the Codex app in the ChatGPT desktop app all read the same `~/.codex/config.toml`, so you add the `[mcp_servers.scenesmith]` block once and the same SceneSmith connection works in all three. The exception is the plugin route: OpenAI's Codex plugin docs say the IDE extension doesn't support plugins, so a plugin install is a desktop-app or CLI route only.
+
+### Is there a SceneSmith plugin I can install from the Codex plugin browser?
+
+Not confirmed as published. A public plugin directory listing is a separate approval step from the MCP server, and SceneSmith's [MCP page](/mcp) tracks the current status. Until that listing appears, the MCP server is the install route, and the plugin browser has nothing from SceneSmith to install.
 
 ### What happens if the MCP server URL changes?
 
@@ -172,7 +197,9 @@ Update the `url` value inside `[mcp_servers.scenesmith]` in `~/.codex/config.tom
 ## Sources
 
 - [OpenAI Codex docs: Model Context Protocol](https://learn.chatgpt.com/docs/extend/mcp) — Codex CLI, IDE extension and ChatGPT desktop app support for Streamable HTTP MCP servers and shared `config.toml` configuration.
-- [OpenAI Codex developer docs: connect Codex to an MCP server](https://developers.openai.com/codex/extend/mcp) — `codex mcp add NAME --url URL` CLI syntax and the `~/.codex/config.toml` block.
+- [OpenAI Codex developer docs: connect Codex to an MCP server](https://developers.openai.com/codex/mcp) — `codex mcp add NAME --url URL`, the `~/.codex/config.toml` block, `codex mcp login SERVER-NAME` and the `--no-browser` flag for OAuth servers, and no stated plan requirement (read 2026-11-07).
+- [OpenAI Codex docs: plugins](https://developers.openai.com/codex/plugins) — plugins bundle skills and MCP servers, one universal plugin directory shared by ChatGPT and Codex, `/plugins` in the CLI, and "The IDE extension doesn't support plugins" (read 2026-11-07).
+- [OpenAI Codex docs: skills](https://developers.openai.com/codex/skills) — standalone skills available in the ChatGPT desktop app, Codex CLI and IDE extension (read 2026-11-07).
 - [Meta: Instagram Platform overview](https://developers.facebook.com/docs/instagram-platform/) — Instagram Graph API requires a Business or Creator account and a connected Facebook Page for publishing endpoints.
 - [Meta: Instagram Graph API reference](https://developers.facebook.com/docs/instagram-api/) — current publishing endpoints, required scopes, and rate-limit notes for the Instagram API.
 - [SceneSmith connections guide](/connections) — production MCP endpoint and the OAuth steps Codex, ChatGPT, Cursor, VS Code and Devin follow.
