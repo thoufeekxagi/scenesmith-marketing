@@ -4,7 +4,7 @@ description: "A ChatGPT-to-LinkedIn connector can only publish if it exposes wri
 category: "Publishing guide"
 author: "Thoufeek Baber"
 published: "2026-10-12"
-updated: "2026-10-12"
+updated: "2026-11-10"
 primaryKeyword: "chatgpt connector to linkedin"
 image: "/blog/chatgpt-connector-to-linkedin-hero.webp"
 imageAlt: "A large teal speech bubble joined by an orange connector and two round nodes to a rounded card with a white circle on a cream background."
@@ -22,6 +22,18 @@ That distinction answers the question people ask most: does connecting ChatGPT t
 
 Authorization is the second half. A connector holds an OAuth grant from you, and on LinkedIn's side the Posts API is explicit about what that grant covers: `w_member_social` posts on behalf of an authenticated member, while `w_organization_social` posts on behalf of an organization and is restricted to members who hold the ADMINISTRATOR, CONTENT_ADMIN or DIRECT_SPONSORED_CONTENT_POSTER role on that Page. If a connection claims it can post as your Page and you hold none of those roles, a new token will not fix it.
 
+## Which LinkedIn connection do you actually want?
+
+![A flow diagram asking "what do you need?": one branch to "look up a profile" leads to the LinkedIn plugin, a second to "read Page stats" leads to an analytics connector, and a third to "publish a post" leads to a write connector and then to "your approval".](/blog/chatgpt-connector-to-linkedin-read-vs-write.webp)
+
+Three different jobs get described as "connecting ChatGPT to LinkedIn", and only one of them can publish.
+
+- **Looking someone up.** OpenAI publishes a first-party LinkedIn plugin, developed by LinkedIn. Its page, read on 2026-11-10, describes it as a way to "look up any professional on LinkedIn without leaving ChatGPT", see their title, company, location and follower count, and tap through to the full profile. All three example prompts on that page are lookups: an attendee brief, a profile check, a speaker background. The install steps are to browse for plugins, install it, then start a new chat in ChatGPT Work or Codex and ask it to use plugins. Availability depends on the plugin, your plan and your workspace settings.
+- **Reading Page performance.** A data connector reports on a Page you administer: reach, followers, engagement. It is a reporting tool, and it has no reason to hold a publishing scope.
+- **Publishing a post you approved.** This is the only route that needs a write tool, an OAuth grant that covers posting, and a confirmation you actually read before the call runs.
+
+If you searched this phrase because a lookup result came first, that is the whole answer: a lookup plugin reads LinkedIn, and a publishing connector writes to it. Neither is a broken version of the other. Which ChatGPT surface and plan can hold an MCP connection at all is a separate question, covered in [whether ChatGPT supports MCP and on which plan](/blog/chatgpt-mcp-support).
+
 ## How to add a connector to ChatGPT
 
 OpenAI's page on adding a custom MCP server is short. On ChatGPT on the web:
@@ -36,6 +48,21 @@ OpenAI's page on adding a custom MCP server is short. On ChatGPT on the web:
 Two limits on the same page are worth knowing before you plan a workflow. Adding and using custom MCP servers happens on ChatGPT on the web, and workspace permissions and security restrictions, Lockdown included, apply to it. The supported MCP protocols are SSE and streaming HTTP.
 
 A hosted connector follows the same shape. SceneSmith's documented path is its production MCP endpoint, `https://app.scenesmith.design/api/mcp`, plus an OAuth 2.1 authorization prompt; the [connection guide](/connections) and the [MCP page](/mcp) list the clients that can connect today: ChatGPT, Codex, Cursor, VS Code and Devin, and other MCP-compatible clients. Anything outside that list is undocumented, so treat it as untested rather than supported. Two useful checks live on those pages: use an HTTPS-capable client that supports server-sent events or streamable HTTP, and never paste a bearer token or provider secret into a client configuration.
+
+## The same connection from Codex
+
+SceneSmith's [connection guide](/connections) lists Codex beside ChatGPT, so this setup can happen in the CLI instead. OpenAI's Codex MCP documentation, read on 2026-11-10, describes one configuration shared by the ChatGPT desktop app, the Codex CLI and the IDE extension: `~/.codex/config.toml` by default, or `.codex/config.toml` inside a trusted project. You configure a server once and switch between those clients without repeating it.
+
+The CLI path, in the order the documentation gives it:
+
+1. **Add the server.** The remote form is `codex mcp add NAME --url URL`, with `--oauth-client-id` added when your authorisation server requires a pre-registered client; the document's own example is `codex mcp add example --url https://mcp.example.com --oauth-client-id my-client`. SceneSmith's production endpoint is `https://app.scenesmith.design/api/mcp`, so the command uses that URL with a name you will recognise, such as `scenesmith`. A local stdio server uses the other documented form: `codex mcp add context7 -- npx -y @upstash/context7-mcp`.
+2. **Check what registered.** `codex mcp list` shows configured servers, and `/mcp` inside the Codex TUI shows the active ones.
+3. **Authorise it.** For a server that supports OAuth, the documentation says to run `codex mcp login NAME`, using the name you added. On a machine without a local browser, add `--no-browser`, open the printed authorisation URL yourself, and paste the full redirect URL back into the terminal — the docs say to do that even when the browser cannot load the callback page. Register the exact callback URL that `codex mcp add` prints.
+4. **Set the approval behaviour.** This is Codex's version of the confirmation prompt. `default_tools_approval_mode` accepts `auto`, `prompt`, `writes` and `approve`, and `writes` prompts for any tool that is not marked read-only. For a server that can publish, `writes` is the setting that keeps a post from leaving without a prompt. Individual tools can override that default in the same file.
+
+Two cautions sit in the same document. `config.toml` can hold an OAuth client secret, so keep the file private and out of version control. And scopes can be narrowed or widened per login with `codex mcp login NAME --scopes read,write`, which is convenient until you grant a write scope you did not mean to use.
+
+For the end-to-end version of that flow, [posting to Instagram from Codex](/blog/codex-instagram-publishing) follows the same draft, approve and verify sequence on the other side of the connector.
 
 ## The confirmation step is the publishing gate
 
@@ -103,6 +130,14 @@ You will see the draft and nothing will publish, because the tool call fails on 
 
 No. LinkedIn's own composer schedules a post from 10 minutes to three months ahead at no cost. A connector is for keeping the draft, the approval and the delivery record in one place when the work starts in an AI chat.
 
+### Does ChatGPT already have a LinkedIn plugin?
+
+Yes. OpenAI publishes a LinkedIn plugin developed by LinkedIn. Its page, read on 2026-11-10, describes profile lookups — title, company, location, follower count — with a link to the full profile, and its install steps end in a new chat in ChatGPT Work or Codex. It is a lookup tool, not a publishing tool, and availability depends on your plan and workspace settings.
+
+### Can I set up the same connection in Codex instead?
+
+Yes. Codex reads MCP servers from `config.toml` — `~/.codex/config.toml` by default, or `.codex/config.toml` in a trusted project — and the ChatGPT desktop app, Codex CLI and IDE extension share that file. Add the endpoint with `codex mcp add` and `--url`, check it with `codex mcp list`, authorise with `codex mcp login NAME`, and set `default_tools_approval_mode` to `writes` so tools that are not read-only prompt you first. SceneSmith's connection guide lists Codex as a supported client.
+
 ## Sources
 
 - [Add custom MCP server](https://developers.openai.com/api/docs/guides/custom-mcp-server) — OpenAI developer documentation: adding a custom MCP server as a plugin, read and write tools, web-only access, workspace restrictions, authentication options, confirmation behaviour. Retrieved 2026-10-12.
@@ -110,4 +145,6 @@ No. LinkedIn's own composer schedules a post from 10 minutes to three months ahe
 - [LinkedIn Help: Schedule posts](https://www.linkedin.com/help/linkedin/answer/a1347212) — member scheduling window, UTC conversion, unsupported post types. Retrieved 2026-10-12.
 - [LinkedIn Help: Scheduled posts for LinkedIn Pages](https://www.linkedin.com/help/linkedin/answer/a548192/scheduled-posts-for-linkedin-pages) — Page admin roles and the one-hour minimum. Retrieved 2026-10-12.
 - [LinkedIn Marketing API: Posts API permissions](https://learn.microsoft.com/en-us/linkedin/marketing/community-management/shares/posts-api) — `w_member_social`, `w_organization_social` and the Page roles that scope requires. Retrieved 2026-10-12.
-- [SceneSmith connection guide](/connections) and [MCP connections page](/mcp) — supported clients, production endpoint, OAuth 2.1 with PKCE, and the safe first test. Read 2026-10-12.
+- [SceneSmith connection guide](/connections) and [MCP connections page](/mcp) — supported clients, production endpoint, OAuth 2.1 with PKCE, and the safe first test. Read 2026-11-10.
+- [LinkedIn plugin for ChatGPT](https://openai.com/business/plugins/linkedin/) — OpenAI: the first-party LinkedIn plugin, its lookup prompts (attendee brief, profile check, speaker backgrounds), install steps naming ChatGPT Work or Codex, and the plan and workspace caveat. Retrieved 2026-11-10.
+- [Codex MCP](https://developers.openai.com/codex/mcp) — OpenAI developer documentation: `config.toml` location and the configuration shared by the ChatGPT desktop app, Codex CLI and IDE extension, `codex mcp add` / `codex mcp list` / `codex mcp login`, `--no-browser`, the OAuth callback URL, approval modes, and the client-secret warning. Retrieved 2026-11-10.
