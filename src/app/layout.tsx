@@ -36,6 +36,8 @@ export default function RootLayout({children}: Readonly<{children: React.ReactNo
       <head>
         <GoogleAnalytics />
         <link rel="stylesheet" href="/trial-modal-fix.css?v=20260918-3" />
+        {/* GrowthRouter analytics: ~1 KB, no cookies, respects DNT/GPC. Production only. */}
+        {!previewNoindex && <script src="https://app.growthrouter.dev/t.js" data-site="scenesmith" defer></script>}
       </head>
       <body className={jakarta.variable}>{children}</body>
     </html>
